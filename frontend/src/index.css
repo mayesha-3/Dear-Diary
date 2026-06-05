@@ -1,0 +1,92 @@
+:root {
+  --text: #4a3c2a; /* ink-like brown */
+  --text-h: #2b1d0e; /* darker headings */
+  --bg: #fffdf8; /* off-white paper */
+  --border: #d9cbb3; /* parchment border */
+  --code-bg: #f9f6f0; /* subtle paper tone */
+  --accent: #c97b63; /* warm ink accent */
+  --accent-bg: rgba(201, 123, 99, 0.15);
+  --accent-border: rgba(201, 123, 99, 0.5);
+  --social-bg: rgba(249, 246, 240, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.08) 0 8px 12px -3px,
+    rgba(0, 0, 0, 0.04) 0 3px 5px -2px;
+
+  --sans: 'Patrick Hand', 'Comic Neue', cursive;
+  --heading: 'Shadows Into Light', 'Caveat', cursive;
+  --mono: 'Nanum Pen Script', cursive;
+
+  font: 18px/150% var(--sans);
+  letter-spacing: 0.3px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* keep your existing dark theme */
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
+      rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 400;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 48px;
+  letter-spacing: -1px;
+  margin: 28px 0;
+}
+h2 {
+  font-size: 22px;
+  line-height: 120%;
+  margin: 0 0 10px;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 16px;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: var(--text-h);
+}
+header {
+  background: repeating-linear-gradient(
+    to bottom,
+    #ffffff,
+    #ffffff 28px,
+    #eaeaea 29px
+  );
+
+  border-inline: 1px solid var(--border);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+}
