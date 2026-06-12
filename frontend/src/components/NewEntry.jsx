@@ -310,7 +310,7 @@ export default function NewEntry() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full px-6 py-3 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 disabled:bg-gray-400"
+          className="w-full px-6 py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-700 disabled:bg-gray-400"
         >
           {saving ? 'Saving...' : 'Save Entry'}
         </button>

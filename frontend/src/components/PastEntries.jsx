@@ -114,7 +114,7 @@ export default function PastEntries() {
       <h1 className="text-3xl font-bold mb-6">Past Entries</h1>
 
       {/* New Entry Button */}
-      <Link to="/new" className="inline-block px-6 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 mb-6">
+      <Link to="/new" className="inline-block px-6 py-2 bg-gray-600 text-white rounded font-semibold hover:bg-gray-700 mb-6">
         ✎ New Entry
       </Link>
 
@@ -131,7 +131,7 @@ export default function PastEntries() {
               <p className="text-sm text-gray-600 mb-4">{formatDate(picOfDay.entryDate)}</p>
               <Link
                 to={`/entry/${picOfDay.entryId}`}
-                className="text-blue-600 hover:underline"
+                className="text-gray-600 hover:underline"
               >
                 Read full entry →
               </Link>
@@ -176,7 +176,7 @@ export default function PastEntries() {
             <div key={entry._id} className="border rounded-lg p-4 hover:bg-gray-50 transition">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-blue-600 hover:text-blue-800">
+                  <h3 className="text-xl font-semibold text-gray-600 hover:text-gray-800">
                     <Link to={`/entry/${entry._id}`}>{entry.title}</Link>
                   </h3>
                   <p className="text-sm text-gray-500 mb-2">{formatDate(entry.entryDate)}</p>
@@ -193,7 +193,7 @@ export default function PastEntries() {
               <div className="mt-3 flex gap-2">
                 <Link
                   to={`/entry/${entry._id}`}
-                  className="text-blue-600 hover:underline text-sm"
+                  className="text-gray-600 hover:underline text-sm"
                 >
                   Read More
                 </Link>

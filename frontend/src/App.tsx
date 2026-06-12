@@ -1,5 +1,6 @@
+import React, { useState } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BookDupe from "./components/BookDupe";
@@ -11,10 +12,12 @@ function Home() {
   return (
     <main className="p-4">
       <p className="text-lg text-gray-700">
-        Welcome to Dear Diary, your personal journaling app. Start writing
-        your thoughts and memories today!
+        Welcome to Dear Diary, your personal journaling app. Start writing your
+        thoughts and memories today!
       </p>
-      <br /><br /><br />
+      <br />
+      <br />
+      <br />
       <div className="flex justify-center self-center pl-[200px]">
         <BookDupe />
       </div>
@@ -23,20 +26,25 @@ function Home() {
 }
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/new" element={<NewEntry />} />
-        <Route path="/entries" element={<PastEntries />} />
-        <Route path="/entry/:id" element={<EntryView />} />
-      </Routes>
+  const [open, setOpen] = useState<string | null>(null);
 
-      {/* Joynab starts here 
-      Footer banabi, try korbi accoddion effect diye footer er about us, contact etc open hoy emon korte*/}
-      <Footer />
-    </BrowserRouter>
+  const toggle = (section: string) => {
+    setOpen(open === section ? null : section);
+  };
+
+  return (
+    <>
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/new" element={<NewEntry />} />
+          <Route path="/entries" element={<PastEntries />} />
+          <Route path="/entry/:id" element={<EntryView />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+    </>
   );
 }
 
