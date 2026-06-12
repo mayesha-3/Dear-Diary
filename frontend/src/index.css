@@ -26,6 +26,17 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  /* diary effect */
+    background: repeating-linear-gradient(
+    to bottom,
+    #ffffff,
+    #fdfdfd 28px,
+    #e1e1e1 29px
+  );
+
+  border-inline: 1px solid var(--border);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+
   @media (max-width: 1024px) {
     font-size: 16px;
   }
@@ -34,7 +45,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* keep your existing dark theme */
-    --text: #9ca3af;
+    --text: #434345;
     --text-h: #f3f4f6;
     --bg: #16171d;
     --border: #2e303a;
@@ -79,14 +90,4 @@ code {
   padding: 6px 10px;
   color: var(--text-h);
 }
-header {
-  background: repeating-linear-gradient(
-    to bottom,
-    #ffffff,
-    #ffffff 28px,
-    #eaeaea 29px
-  );
 
-  border-inline: 1px solid var(--border);
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
-}

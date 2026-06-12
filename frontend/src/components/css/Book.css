@@ -1,0 +1,88 @@
+.body {
+    background: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+  } 
+
+  .book {
+    perspective: 2500px;
+    width: 32vw;
+    height: 90vh;
+    position: relative;
+    rotate: -3deg;
+  }
+
+  .page {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border-radius: 45px;
+  }
+
+  .front, .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+
+  .front {
+    background: #f4f7faf8;
+    color: #333;
+  }
+
+  .back {
+    background:#f4f7faf8;
+    color: #555;
+    transform: rotateY(180deg);
+  }
+
+  .flipped {
+    transform: rotateY(-180deg);
+  }
+
+  /* Stack pages */
+  .page:nth-child(1) { z-index: 5; }
+  .page:nth-child(2) { z-index: 4; }
+  .page:nth-child(3) { z-index: 3; }
+  .page:nth-child(4) { z-index: 2; }
+  .page:nth-child(5) { z-index: 1; }
+
+  .page {
+  transform-origin: left center;
+  transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+  transform-style: preserve-3d;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.page.flipped {
+  transform: rotateY(-180deg) rotateX(0 deg);
+}
+
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.15), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+
+.page.flipped::before {
+  opacity: 1;
+}

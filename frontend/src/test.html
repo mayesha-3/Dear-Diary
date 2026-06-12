@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple-Style Page Flip</title>
+<style>
+  body {
+    background: #e5e5e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding-left: 30vw;
+    font-family: sans-serif;
+  }
+
+  .book {
+    perspective: 2000px;
+    width: 400px;
+    height: 500px;
+    position: relative;
+  }
+
+  .page {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+
+  .front, .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+
+  .front {
+    background: white;
+    color: #333;
+  }
+
+  .back {
+    background: #fafafa;
+    color: #555;
+    transform: rotateY(180deg);
+  }
+
+  .flipped {
+    transform: rotateY(-180deg);
+  }
+
+  /* Stack pages */
+  .page:nth-child(1) { z-index: 5; }
+  .page:nth-child(2) { z-index: 4; }
+  .page:nth-child(3) { z-index: 3; }
+  
+
+  .page {
+  transform-origin: left center;
+  transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+  transform-style: preserve-3d;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.page.flipped {
+  transform: rotateY(-180deg) rotateX(2deg);
+}
+
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.15), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+
+.page.flipped::before {
+  opacity: 1;
+}
+
+</style>
+</head>
+<body>
+
+<div class="book">
+  <div class="page" id="page1">
+    <div class="front">Page 1</div>
+    <div class="back">Page 2</div>
+  </div>
+  <div class="page" id="page2">
+    <div class="front">Page 3</div>
+    <div class="back">Page 4</div>
+  </div>
+  <div class="page" id="page3">
+    <div class="front">Page 5</div>
+    <div class="back">Page 6</div>
+  </div>
+</div>
+
+<script>
+  const pages = document.querySelectorAll('.page');
+  let currentPage = 0;
+
+  document.querySelector('.book').addEventListener('click', () => {
+    if (currentPage < pages.length) {
+      pages[currentPage].classList.add('flipped');
+      currentPage++;
+    } else {
+      // Reset book if all pages flipped
+      pages.forEach(p => p.classList.remove('flipped'));
+      currentPage = 0;
+    }
+  });
+</script>
+
+</body>
+</html>
