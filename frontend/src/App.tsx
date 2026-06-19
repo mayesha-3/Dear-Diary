@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { auth } from "./firebase";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BookDupe from "./components/BookDupe";
 import NewEntry from "./components/NewEntry";
 import PastEntries from "./components/PastEntries";
 import EntryView from "./components/EntryView";
+import Auth from "./components/Auth";
 
 function Home() {
   return (
@@ -26,11 +29,37 @@ function Home() {
 }
 
 function App() {
-  const [open, setOpen] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const toggle = (section: string) => {
-    setOpen(open === section ? null : section);
-  };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background: 'repeating-linear-gradient(to bottom, #fffdf8, #fffdf8 28px, #e1e1e1 29px)',
+          fontFamily: 'var(--heading)'
+        }}
+      >
+        <div className="text-center">
+          <h2 className="text-3xl text-[#4a3c2a] animate-pulse">Opening diary pages...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   return (
     <>

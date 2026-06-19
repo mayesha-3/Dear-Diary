@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { db, isFirebaseConnected } from './config/firebase.js';
 
 // Import routes
 import uploadRoutes from './routes/upload.js';
@@ -15,31 +15,17 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/deardiary';
-let mongoConnected = false;
-
-// Connect to MongoDB
-mongoose.connect(MONGODB_URI)
-  .then(() => {
-    mongoConnected = true;
-    console.log('✓ Connected to MongoDB Atlas successfully!');
-  })
-  .catch(err => {
-    console.error('✗ MongoDB connection error:', err.message);
-    console.error('💡 Tip: Make sure your IP is whitelisted in MongoDB Atlas Network Access settings');
-    // Continue without MongoDB - will show error to frontend
-  });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware to check MongoDB connection (optional)
+// Middleware to check Firebase connection
 app.use((req, res, next) => {
-  if (!mongoConnected && req.path.startsWith('/api/entries')) {
+  if (!isFirebaseConnected() && req.path.startsWith('/api/entries')) {
     return res.status(503).json({ 
-      message: 'Database is still connecting... Please wait a moment and try again.',
+      message: 'Firebase database is not connected or initialized... Please check server configuration.',
       connected: false 
     });
   }

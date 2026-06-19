@@ -1,23 +1,32 @@
 import express from 'express';
-import Entry from '../models/Entry.js';
+import { db } from '../config/firebase.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// FOR DEVELOPMENT: Mock user middleware (since no auth yet)
-// In production, replace this with your real auth middleware
-router.use((req, res, next) => {
-  // Use a fixed user ID for now, or get it from auth token
-  req.user = { id: '507f1f77bcf86cd799439011' }; // Mock user ID
-  next();
-});
+// Protect all entry routes with Firebase Authentication
+router.use(requireAuth);
 
 // Strip HTML tags down to plain text for list-page excerpts.
 function htmlToExcerpt(html, maxLen = 180) {
+  if (!html) return '';
   const text = String(html)
     .replace(/<[^>]*>/g, ' ') // remove tags
     .replace(/\s+/g, ' ')
     .trim();
   return text.length > maxLen ? `${text.slice(0, maxLen).trim()}…` : text;
+}
+
+// Helper to convert Firestore dates to ISO strings
+function formatFirestoreDoc(doc) {
+  const data = doc.data();
+  return {
+    _id: doc.id,
+    ...data,
+    entryDate: data.entryDate?.toDate ? data.entryDate.toDate().toISOString() : data.entryDate,
+    createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+    updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+  };
 }
 
 // -------------------------------------------
@@ -30,26 +39,48 @@ router.get('/', async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit, 10) || 10, 50);
     const skip = (page - 1) * limit;
 
-    const filter = { user: req.user.id };
+    // Fetch all entries for this user.
+    // We sort/filter in JS to avoid requiring the user to set up composite indexes.
+    const snapshot = await db.collection('entries')
+      .where('user', '==', req.user.id)
+      .get();
+
+    let entries = [];
+    snapshot.forEach(doc => {
+      entries.push(formatFirestoreDoc(doc));
+    });
+
+    // Sort by entryDate descending
+    entries.sort((a, b) => {
+      const dateA = new Date(a.entryDate || 0);
+      const dateB = new Date(b.entryDate || 0);
+      return dateB - dateA;
+    });
+
+    // Apply search filter if present
     if (req.query.search) {
-      filter.$or = [
-        { title: { $regex: req.query.search, $options: 'i' } },
-        { excerpt: { $regex: req.query.search, $options: 'i' } },
-      ];
+      const searchRegex = new RegExp(req.query.search, 'i');
+      entries = entries.filter(entry => 
+        searchRegex.test(entry.title || '') || searchRegex.test(entry.excerpt || '')
+      );
     }
 
-    const [entries, total] = await Promise.all([
-      Entry.find(filter)
-        .sort({ entryDate: -1 })
-        .skip(skip)
-        .limit(limit)
-        .select('title excerpt entryDate picOfTheDay createdAt updatedAt')
-        .lean(),
-      Entry.countDocuments(filter),
-    ]);
+    const total = entries.length;
+    const paginatedEntries = entries.slice(skip, skip + limit);
+
+    // Frontend expects only specific fields for the list view to reduce bandwidth
+    const listEntries = paginatedEntries.map(e => ({
+      _id: e._id,
+      title: e.title,
+      excerpt: e.excerpt,
+      entryDate: e.entryDate,
+      picOfTheDay: e.picOfTheDay,
+      createdAt: e.createdAt,
+      updatedAt: e.updatedAt,
+    }));
 
     return res.json({
-      entries,
+      entries: listEntries,
       page,
       limit,
       total,
@@ -68,18 +99,31 @@ router.get('/', async (req, res) => {
 // -------------------------------------------
 router.get('/pic-of-the-day', async (req, res) => {
   try {
-    const entry = await Entry.findOne({
-      user: req.user.id,
-      'picOfTheDay.enabled': true,
-      'picOfTheDay.imageUrl': { $ne: null },
-    })
-      .sort({ entryDate: -1 })
-      .select('title entryDate picOfTheDay _id')
-      .lean();
+    const snapshot = await db.collection('entries')
+      .where('user', '==', req.user.id)
+      .where('picOfTheDay.enabled', '==', true)
+      .get();
 
-    if (!entry) {
+    let entries = [];
+    snapshot.forEach(doc => {
+      const data = formatFirestoreDoc(doc);
+      if (data.picOfTheDay?.imageUrl) {
+        entries.push(data);
+      }
+    });
+
+    if (entries.length === 0) {
       return res.json({ picOfTheDay: null });
     }
+
+    // Sort by entryDate descending
+    entries.sort((a, b) => {
+      const dateA = new Date(a.entryDate || 0);
+      const dateB = new Date(b.entryDate || 0);
+      return dateB - dateA;
+    });
+
+    const entry = entries[0];
 
     return res.json({
       picOfTheDay: {
@@ -101,13 +145,16 @@ router.get('/pic-of-the-day', async (req, res) => {
 // -------------------------------------------
 router.get('/:id', async (req, res) => {
   try {
-    const entry = await Entry.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+    const doc = await db.collection('entries').doc(req.params.id).get();
 
-    if (!entry) {
+    if (!doc.exists) {
       return res.status(404).json({ message: 'Entry not found.' });
+    }
+
+    const entry = formatFirestoreDoc(doc);
+
+    if (entry.user !== req.user.id) {
+      return res.status(403).json({ message: 'Forbidden. You do not own this entry.' });
     }
 
     return res.json({ entry });
@@ -129,22 +176,35 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Title and content are required.' });
     }
 
-    const entry = new Entry({
+    const parsedEntryDate = entryDate ? new Date(entryDate) : new Date();
+
+    const entryData = {
       user: req.user.id,
       title,
       content,
       excerpt: excerpt || htmlToExcerpt(content),
-      entryDate: entryDate || new Date(),
+      entryDate: parsedEntryDate,
       stickers: stickers || [],
       picOfTheDay: picOfTheDay || { imageUrl: null, enabled: false },
-    });
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-    await entry.save();
+    const docRef = await db.collection('entries').add(entryData);
+    
+    // Construct return object
+    const createdEntry = {
+      _id: docRef.id,
+      ...entryData,
+      entryDate: parsedEntryDate.toISOString(),
+      createdAt: entryData.createdAt.toISOString(),
+      updatedAt: entryData.updatedAt.toISOString(),
+    };
 
     return res.status(201).json({
       message: 'Entry created successfully.',
-      entryId: entry._id,
-      entry,
+      entryId: docRef.id,
+      entry: createdEntry,
     });
   } catch (err) {
     console.error('POST /api/entries failed:', err);
@@ -160,25 +220,40 @@ router.put('/:id', async (req, res) => {
   try {
     const { title, content, excerpt, entryDate, stickers, picOfTheDay } = req.body;
 
-    const entry = await Entry.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+    const docRef = db.collection('entries').doc(req.params.id);
+    const doc = await docRef.get();
 
-    if (!entry) {
+    if (!doc.exists) {
       return res.status(404).json({ message: 'Entry not found.' });
     }
 
-    if (title) entry.title = title;
-    if (content) entry.content = content;
-    if (excerpt) entry.excerpt = excerpt;
-    if (entryDate) entry.entryDate = entryDate;
-    if (stickers) entry.stickers = stickers;
-    if (picOfTheDay) entry.picOfTheDay = picOfTheDay;
+    const entry = formatFirestoreDoc(doc);
 
-    await entry.save();
+    if (entry.user !== req.user.id) {
+      return res.status(403).json({ message: 'Forbidden. You do not own this entry.' });
+    }
 
-    return res.json({ message: 'Entry updated.', entry });
+    const updateData = {
+      updatedAt: new Date(),
+    };
+
+    if (title !== undefined) updateData.title = title;
+    if (content !== undefined) {
+      updateData.content = content;
+      updateData.excerpt = excerpt || htmlToExcerpt(content);
+    }
+    if (entryDate !== undefined) updateData.entryDate = new Date(entryDate);
+    if (stickers !== undefined) updateData.stickers = stickers;
+    if (picOfTheDay !== undefined) updateData.picOfTheDay = picOfTheDay;
+
+    await docRef.update(updateData);
+
+    const updatedDoc = await docRef.get();
+
+    return res.json({ 
+      message: 'Entry updated.', 
+      entry: formatFirestoreDoc(updatedDoc) 
+    });
   } catch (err) {
     console.error('PUT /api/entries/:id failed:', err);
     return res.status(500).json({ message: 'Could not update entry.' });
@@ -191,14 +266,20 @@ router.put('/:id', async (req, res) => {
 // -------------------------------------------
 router.delete('/:id', async (req, res) => {
   try {
-    const entry = await Entry.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+    const docRef = db.collection('entries').doc(req.params.id);
+    const doc = await docRef.get();
 
-    if (!entry) {
+    if (!doc.exists) {
       return res.status(404).json({ message: 'Entry not found.' });
     }
+
+    const entry = formatFirestoreDoc(doc);
+
+    if (entry.user !== req.user.id) {
+      return res.status(403).json({ message: 'Forbidden. You do not own this entry.' });
+    }
+
+    await docRef.delete();
 
     return res.json({ message: 'Entry deleted.' });
   } catch (err) {
