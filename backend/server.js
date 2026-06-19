@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 // Import routes
 import uploadRoutes from './routes/upload.js';
 import entryRoutes from './routes/entries.js';
+import pdfRoutes from './routes/route.js';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/deardiary';
+let mongoConnected = false;
 
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI)
@@ -54,6 +56,7 @@ app.get('/', (req, res) => {
 
 // API routes
 app.use('/api/upload', uploadRoutes);
+app.use('/api', pdfRoutes);
 app.use('/api/entries', entryRoutes);
 
 // Error handling middleware

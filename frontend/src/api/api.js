@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // Centralised axios instance. Adjust baseURL via your .env
-// (e.g. VITE_API_URL=http://localhost:5000/api)
+// (e.g. VITE_API_URL=http://localhost:5100/api)
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5100/api',
 });
 
 // Attach auth token automatically if you store one (adjust to your auth setup)

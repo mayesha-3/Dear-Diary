@@ -4,7 +4,7 @@ import api, { uploadImage } from '../api/api';
 
 // Base URL of the API server, used to resolve "/uploads/.." paths
 // returned by the upload route into full <img src> URLs.
-const ASSET_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+const ASSET_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5100/api').replace(/\/api\/?$/, '');
 
 function resolveAssetUrl(url) {
   if (!url) return url;
@@ -25,13 +25,14 @@ function todayISODate() {
 export default function NewEntry() {
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const [entryDate, setEntryDate] = useState(todayISODate());
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
 
   // Stickers: { stickerId, imageUrl, x, y, width, rotation, zIndex }
   // x / y are percentages of the page container's width/height so the
   // "fixed position on page" stays correct at any screen size.
+
   const [stickers, setStickers] = useState([]);
   const [selectedStickerId, setSelectedStickerId] = useState(null);
 
@@ -39,14 +40,50 @@ export default function NewEntry() {
   const [picOfDay, setPicOfDay] = useState({ imageUrl: null, enabled: false });
   const [picUploading, setPicUploading] = useState(false);
 
+  //pdf scanning
+  const [pdfScanning, setPdfScanning] = useState(false);
+
   const [stickerUploading, setStickerUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   // Refs for drag handling
   const pageRef = useRef(null); // the bounding box stickers are positioned within
   const dragState = useRef(null); // { stickerId, offsetXPercent, offsetYPercent }
+
+  // ---------------------------------------------------------------
+  // PDF Scanner Handler
+  // ---------------------------------------------------------------
+  const handlePdfScan = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPdfScanning(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const formData = new FormData();
+    formData.append("pdf", file);
+
+    try {
+      // Send PDF to your Node.js backend route
+      const res = await api.post("/upload-pdf", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Inject the text received from the Python pipeline right into the state
+      setContent(res.data.extractedText);
+      setSuccessMsg("PDF parsed successfully! Text injected below.");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(
+        err.response?.data?.error || "Failed to parse the PDF document.",
+      );
+    } finally {
+      setPdfScanning(false);
+    }
+  }, []);
 
   // ---------------------------------------------------------------
   // Pic of the day
@@ -56,13 +93,13 @@ export default function NewEntry() {
     if (!file) return;
 
     setPicUploading(true);
-    setErrorMsg('');
+    setErrorMsg("");
     try {
       const imageUrl = await uploadImage(file);
       setPicOfDay({ imageUrl, enabled: true });
     } catch (err) {
       console.error(err);
-      setErrorMsg('Failed to upload pic of the day.');
+      setErrorMsg("Failed to upload pic of the day.");
     } finally {
       setPicUploading(false);
     }
@@ -76,7 +113,7 @@ export default function NewEntry() {
     if (!file) return;
 
     setStickerUploading(true);
-    setErrorMsg('');
+    setErrorMsg("");
     try {
       const imageUrl = await uploadImage(file);
       const sticker = {
@@ -92,16 +129,19 @@ export default function NewEntry() {
       setSelectedStickerId(sticker.stickerId);
     } catch (err) {
       console.error(err);
-      setErrorMsg('Failed to upload sticker.');
+      setErrorMsg("Failed to upload sticker.");
     } finally {
       setStickerUploading(false);
     }
   }, []);
 
-  const handleDeleteSticker = useCallback((stickerId) => {
-    setStickers((prev) => prev.filter((s) => s.stickerId !== stickerId));
-    if (selectedStickerId === stickerId) setSelectedStickerId(null);
-  }, [selectedStickerId]);
+  const handleDeleteSticker = useCallback(
+    (stickerId) => {
+      setStickers((prev) => prev.filter((s) => s.stickerId !== stickerId));
+      if (selectedStickerId === stickerId) setSelectedStickerId(null);
+    },
+    [selectedStickerId],
+  );
 
   // Drag handlers for stickers
   const handleMouseDown = (e, stickerId) => {
@@ -126,11 +166,27 @@ export default function NewEntry() {
     const rect = pageRef.current.getBoundingClientRect();
     const { stickerId, offsetXPercent, offsetYPercent } = dragState.current;
 
-    const newXPercent = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100 - offsetXPercent));
-    const newYPercent = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100 - offsetYPercent));
+    const newXPercent = Math.max(
+      0,
+      Math.min(
+        100,
+        ((e.clientX - rect.left) / rect.width) * 100 - offsetXPercent,
+      ),
+    );
+    const newYPercent = Math.max(
+      0,
+      Math.min(
+        100,
+        ((e.clientY - rect.top) / rect.height) * 100 - offsetYPercent,
+      ),
+    );
 
     setStickers((prev) =>
-      prev.map((s) => (s.stickerId === stickerId ? { ...s, x: newXPercent, y: newYPercent } : s))
+      prev.map((s) =>
+        s.stickerId === stickerId
+          ? { ...s, x: newXPercent, y: newYPercent }
+          : s,
+      ),
     );
   };
 
@@ -141,48 +197,63 @@ export default function NewEntry() {
   // ---------------------------------------------------------------
   // Save entry
   // ---------------------------------------------------------------
-  const handleSave = useCallback(async (e) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) {
-      setErrorMsg('Title and content are required.');
-      return;
-    }
+  const handleSave = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!title.trim() || !content.trim()) {
+        setErrorMsg("Title and content are required.");
+        return;
+      }
 
-    setSaving(true);
-    setErrorMsg('');
-    setSuccessMsg('');
+      setSaving(true);
+      setErrorMsg("");
+      setSuccessMsg("");
 
-    try {
-      const payload = {
-        title: title.trim(),
-        content,
-        excerpt: content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180),
-        entryDate,
-        stickers,
-        picOfTheDay: picOfDay,
-      };
+      try {
+        const payload = {
+          title: title.trim(),
+          content,
+          excerpt: content
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 180),
+          entryDate,
+          stickers,
+          picOfTheDay: picOfDay,
+        };
 
-      const res = await api.post('/entries', payload);
-      setSuccessMsg('Entry saved successfully!');
+        const res = await api.post("/entries", payload);
+        setSuccessMsg("Entry saved successfully!");
 
-      // Redirect to the new entry after a short delay
-      setTimeout(() => {
-        navigate(`/entry/${res.data.entryId}`);
-      }, 500);
-    } catch (err) {
-      console.error(err);
-      setErrorMsg(err.response?.data?.message || 'Failed to save entry.');
-    } finally {
-      setSaving(false);
-    }
-  }, [title, content, entryDate, stickers, picOfDay, navigate]);
+        // Redirect to the new entry after a short delay
+        setTimeout(() => {
+          navigate(`/entry/${res.data.entryId}`);
+        }, 500);
+      } catch (err) {
+        console.error(err);
+        setErrorMsg(err.response?.data?.message || "Failed to save entry.");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [title, content, entryDate, stickers, picOfDay, navigate],
+  );
 
   return (
     <main className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">New Entry</h1>
 
-      {errorMsg && <div className="bg-red-100 text-red-700 p-4 rounded mb-4">{errorMsg}</div>}
-      {successMsg && <div className="bg-green-100 text-green-700 p-4 rounded mb-4">{successMsg}</div>}
+      {errorMsg && (
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+          {errorMsg}
+        </div>
+      )}
+      {successMsg && (
+        <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
+          {successMsg}
+        </div>
+      )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Title */}
@@ -208,7 +279,26 @@ export default function NewEntry() {
           />
         </div>
 
-        {/* Rich Text Editor */}
+        {/* NEW: PDF Document Scanning Component */}
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
+          <label className="block text-sm font-semibold text-blue-900 mb-2">
+            ✨ Autofill via PDF Scan
+          </label>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handlePdfScan}
+            disabled={pdfScanning}
+            className="block text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-white hover:file:bg-blue-800 disabled:opacity-50"
+          />
+          {pdfScanning && (
+            <p className="text-xs font-medium text-blue-700 mt-2 animate-pulse">
+              Running Python AI pipeline... reading PDF data...
+            </p>
+          )}
+        </div>
+
+        {/* Content Box */}
         <div>
           <label className="block text-sm font-medium mb-2">Content</label>
           <textarea
@@ -216,22 +306,31 @@ export default function NewEntry() {
             onChange={(e) => setContent(e.target.value)}
             className="w-full px-4 py-3 border rounded font-mono text-sm"
             rows="12"
-            placeholder="Write your diary entry here..."
+            placeholder="Write your diary entry here or scan a PDF to populate..."
           />
-          <p className="text-xs text-gray-500 mt-2">You can use basic HTML if needed: &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;br&gt; for line breaks, etc.</p>
+          <p className="text-xs text-gray-500 mt-2">
+            You can use basic HTML if needed: &lt;b&gt;bold&lt;/b&gt;,
+            &lt;i&gt;italic&lt;/i&gt;, &lt;br&gt; for line breaks, etc.
+          </p>
         </div>
 
         {/* Pic of the Day */}
         <div>
-          <label className="block text-sm font-medium mb-2">Pic of the Day</label>
+          <label className="block text-sm font-medium mb-2">
+            Pic of the Day
+          </label>
           {picOfDay.imageUrl && (
             <div className="mb-4">
-              <img src={resolveAssetUrl(picOfDay.imageUrl)} alt="Pic of day" width={150} className="rounded" />
+              <img
+                src={resolveAssetUrl(picOfDay.imageUrl)}
+                alt="Pic of day"
+                width={150}
+                className="rounded"
+              />
               <button
                 type="button"
                 onClick={() => setPicOfDay({ imageUrl: null, enabled: false })}
-                className="mt-2 px-3 py-1 bg-red-500 text-white rounded"
-              >
+                className="mt-2 px-3 py-1 bg-red-500 text-white rounded">
                 Remove
               </button>
             </div>
@@ -243,7 +342,9 @@ export default function NewEntry() {
             disabled={picUploading}
             className="px-4 py-2 border rounded"
           />
-          {picUploading && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
+          {picUploading && (
+            <p className="text-sm text-gray-500 mt-2">Uploading...</p>
+          )}
         </div>
 
         {/* Stickers Section */}
@@ -256,7 +357,9 @@ export default function NewEntry() {
             disabled={stickerUploading}
             className="px-4 py-2 border rounded"
           />
-          {stickerUploading && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
+          {stickerUploading && (
+            <p className="text-sm text-gray-500 mt-2">Uploading...</p>
+          )}
         </div>
 
         {/* Stickers Canvas */}
@@ -269,23 +372,21 @@ export default function NewEntry() {
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
               className="relative w-full bg-gray-50 border-2 border-gray-300 rounded p-4"
-              style={{ minHeight: '300px' }}
-            >
+              style={{ minHeight: "300px" }}>
               {stickers.map((sticker) => (
                 <div
                   key={sticker.stickerId}
                   onMouseDown={(e) => handleMouseDown(e, sticker.stickerId)}
                   onClick={() => setSelectedStickerId(sticker.stickerId)}
-                  className={`absolute cursor-move ${selectedStickerId === sticker.stickerId ? 'ring-2 ring-blue-500' : ''}`}
+                  className={`absolute cursor-move ${selectedStickerId === sticker.stickerId ? "ring-2 ring-blue-500" : ""}`}
                   style={{
                     left: `${sticker.x}%`,
                     top: `${sticker.y}%`,
                     width: `${sticker.width}px`,
-                    height: 'auto',
+                    height: "auto",
                     transform: `translateX(-50%) translateY(-50%) rotate(${sticker.rotation}deg)`,
                     zIndex: sticker.zIndex,
-                  }}
-                >
+                  }}>
                   <img
                     src={resolveAssetUrl(sticker.imageUrl)}
                     alt="sticker"
@@ -295,8 +396,7 @@ export default function NewEntry() {
                     <button
                       type="button"
                       onClick={() => handleDeleteSticker(sticker.stickerId)}
-                      className="absolute -top-6 -right-6 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                    >
+                      className="absolute -top-6 -right-6 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
                       ✕
                     </button>
                   )}
@@ -306,13 +406,11 @@ export default function NewEntry() {
           </div>
         )}
 
-        {/* Save Button */}
         <button
           type="submit"
           disabled={saving}
-          className="w-full px-6 py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-700 disabled:bg-gray-400"
-        >
-          {saving ? 'Saving...' : 'Save Entry'}
+          className="w-full px-6 py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-700 disabled:bg-gray-400">
+          {saving ? "Saving..." : "Save Entry"}
         </button>
       </form>
     </main>

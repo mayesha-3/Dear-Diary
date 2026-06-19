@@ -1,0 +1,15 @@
+Title: Sample PDF Document
+Total Pages: 3
+
+--- Page 1 ---
+Hello, this is page 1.
+This PDF is created for testing text extraction.
+
+--- Page 2 ---
+Welcome to page 2.
+You can add more text here to test multi-page extraction.
+
+--- Page 3 ---
+Page 3 contains some special characters:
+© ™ ✓ ∑ ∞ →
+

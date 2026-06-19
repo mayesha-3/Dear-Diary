@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/api';
 
-const ASSET_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+const ASSET_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5100/api').replace(/\/api\/?$/, '');
 
 function resolveAssetUrl(url) {
   if (!url) return url;
