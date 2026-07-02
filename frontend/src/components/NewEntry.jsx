@@ -355,6 +355,9 @@ export default function NewEntry() {
 
       try {
         const payload = {
+          mood,
+          activity,
+          messageToSelf,
           title: title.trim(),
           content,
           excerpt: content
@@ -383,21 +386,26 @@ export default function NewEntry() {
     },
     [title, content, entryDate, stickers, picOfDay, navigate],
   );
+  const [mood, setMood] = useState("");
+  const [activity, setActivity] = useState("");
+  const [messageToSelf, setMessageToSelf] = useState("");
 
   return (
-    <main className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">New Entry</h1>
+    <main className="container mx-auto mt-8 p-6 bg-white border-[3px] border-black rounded-[40px] shadow-2xl relative overflow-hidden">
+      {/* Scrapbook Header */}
+<div className="relative text-center py-8">
 
-      {errorMsg && (
-        <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
-          {errorMsg}
-        </div>
-      )}
-      {successMsg && (
-        <div className="bg-green-100 text-green-700 p-4 rounded mb-4">
-          {successMsg}
-        </div>
-      )}
+  <div className="absolute left-10 top-0 text-2xl">☁</div>
+  <div className="absolute left-32 top-4 text-xl">✦</div>
+
+  <div className="absolute right-10 top-0 text-2xl">♡</div>
+  <div className="absolute right-28 top-5 text-xl">☾</div>
+
+  <h2 className="text-2xl font-black tracking-widest">
+    New Entry
+  </h2>
+
+</div>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Title */}
@@ -496,38 +504,99 @@ export default function NewEntry() {
           </div>
         </div>
 
-        {/* Pic of the Day */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Pic of the Day
-          </label>
-          {picOfDay.imageUrl && (
-            <div className="mb-4">
-              <img
-                src={resolveAssetUrl(picOfDay.imageUrl)}
-                alt="Pic of day"
-                width={150}
-                className="rounded"
-              />
-              <button
-                type="button"
-                onClick={() => setPicOfDay({ imageUrl: null, enabled: false })}
-                className="mt-2 px-3 py-1 bg-red-500 text-white rounded">
-                Remove
-              </button>
-            </div>
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handlePicOfDayChange}
-            disabled={picUploading}
-            className="px-4 py-2 border rounded"
-          />
-          {picUploading && (
-            <p className="text-sm text-gray-500 mt-2">Uploading...</p>
-          )}
+        <div className="grid lg:grid-cols-2 gap-8">
+
+  {/* Left Side */}
+
+  <div className="relative">
+
+    <div className="absolute -top-5 -left-4 rotate-[-20deg] text-3xl">  📸</div>
+    <div className="absolute -bottom-4 -left-3 text-3xl">🌼</div>
+    <div className="absolute -top-2 right-2 text-3xl">✂️</div>
+    <div className="absolute bottom-2 right-2 text-3xl">🖇️</div>
+
+    <div className="border-2 border-gray-300 rounded-3xl p-4 bg-white">
+
+      {picOfDay.imageUrl ? (
+        <img
+          src={resolveAssetUrl(picOfDay.imageUrl)}
+          alt=""
+          className="w-full h-72 object-cover rounded-xl"
+        />
+      ) : (
+        <div className="h-72 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl">
+          Insert Image
         </div>
+      )}
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handlePicOfDayChange}
+        className="mt-4"
+      />
+
+    </div>
+
+  </div>
+
+  {/* Right Side */}
+
+  <div className="space-y-5">
+    <div className="border-2 border-gray-300 rounded-3xl p-4">
+
+      <h3 className="text-xl font-semibold mb-3">
+        How do I feel today?
+      </h3>
+
+      <div className="flex gap-3 flex-wrap">
+
+        <button
+          type="button"
+          onClick={() => setMood("Good")}
+          className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
+            mood === "Good" ? "bg-black text-white" : ""
+          }`}
+        >          😊 Good        </button>
+
+        <button
+          type="button"
+          onClick={() => setMood("Okay")}
+          className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
+            mood === "Okay" ? "bg-black text-white" : ""
+          }`}
+        >          🙂 Okay        </button>
+
+        <button
+          type="button"
+          onClick={() => setMood("Bad")}
+          className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
+            mood === "Bad" ? "bg-black text-white" : ""
+          }`}
+        >          😔 Bad        </button>
+
+      </div>
+
+    </div>
+
+    <div className="border-2 border-gray-300 rounded-3xl p-4">
+
+      <h3 className="font-semibold mb-2">
+        🎀 Activity of the Day
+      </h3>
+
+      <textarea
+        value={activity}
+        onChange={(e) => setActivity(e.target.value)}
+        rows="4"
+        className="w-full outline-none"
+      />
+
+    </div>
+
+  </div>
+
+</div>
 
         {/* Stickers Section */}
         <div>
@@ -595,6 +664,12 @@ export default function NewEntry() {
             </div>
           </div>
         )}
+
+        <div className="flex justify-center gap-8 text-2xl mt-6 opacity-70">
+
+  <span>☁</span>  <span>✦</span>  <span>♡</span>  <span>☾</span>  <span>✿</span>  <span>♡</span>  <span>✦</span>
+
+</div>
 
         <button
           type="submit"
