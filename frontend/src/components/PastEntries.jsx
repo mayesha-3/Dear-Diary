@@ -259,6 +259,14 @@ export default function PastEntries() {
                   {/* Day number */}
                   <span className="cal-day-num">{day}</span>
 
+                  {/* Entry mood/activity summary */}
+                  {entry && (entry.mood || entry.activity) && (
+                    <div className="cal-day-summary">
+                      {entry.mood && <span className="cal-day-chip">Mood: {entry.mood}</span>}
+                      {entry.activity && <span className="cal-day-chip">Act: {entry.activity}</span>}
+                    </div>
+                  )}
+
                   {/* Entry indicator dots */}
                   {entry && (
                     <div className="cal-entry-dot">
@@ -269,7 +277,9 @@ export default function PastEntries() {
                   {/* Hover tooltip */}
                   {entry && (
                     <div className="cal-day-tooltip">
-                      {entry.title}
+                      <strong>{entry.title}</strong>
+                      {entry.mood && <div>Mood: {entry.mood}</div>}
+                      {entry.activity && <div>Activity: {entry.activity}</div>}
                     </div>
                   )}
                 </div>

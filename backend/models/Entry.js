@@ -71,6 +71,18 @@ const EntrySchema = new mongoose.Schema(
       imageUrl: { type: String, default: null },
       enabled: { type: Boolean, default: false },
     },
+    mood: {
+      type: String,
+      default: '',
+    },
+    activity: {
+      type: String,
+      default: '',
+    },
+    messageToSelf: {
+      type: String,
+      default: '',
+    },
     // The diary date this entry belongs to (user-editable, defaults to now)
     entryDate: {
       type: Date,

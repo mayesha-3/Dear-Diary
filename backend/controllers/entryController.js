@@ -34,6 +34,8 @@ export async function getEntries(req, res) {
         excerpt: 1,
         entryDate: 1,
         picOfTheDay: 1,
+        mood: 1,
+        activity: 1,
         createdAt: 1,
         updatedAt: 1,
       })
@@ -114,7 +116,7 @@ export async function getEntry(req, res) {
 // -----------------------------------------------
 export async function createEntry(req, res) {
   try {
-    const { title, content, excerpt, entryDate, stickers, picOfTheDay } = req.body;
+    const { title, content, excerpt, entryDate, stickers, picOfTheDay, mood, activity, messageToSelf } = req.body;
 
     if (!title || !content) {
       return res.status(400).json({ message: 'Title and content are required.' });
@@ -128,6 +130,9 @@ export async function createEntry(req, res) {
       entryDate:  entryDate ? new Date(entryDate) : new Date(),
       stickers:   stickers   || [],
       picOfTheDay: picOfTheDay || { imageUrl: null, enabled: false },
+      mood:       mood || '',
+      activity:   activity || '',
+      messageToSelf: messageToSelf || '',
     });
 
     return res.status(201).json({
@@ -155,12 +160,15 @@ export async function updateEntry(req, res) {
       return res.status(403).json({ message: 'Forbidden.' });
     }
 
-    const { title, content, excerpt, entryDate, stickers, picOfTheDay } = req.body;
+    const { title, content, excerpt, entryDate, stickers, picOfTheDay, mood, activity, messageToSelf } = req.body;
 
     if (title      !== undefined) entry.title      = title;
     if (entryDate  !== undefined) entry.entryDate  = new Date(entryDate);
     if (stickers   !== undefined) entry.stickers   = stickers;
     if (picOfTheDay !== undefined) entry.picOfTheDay = picOfTheDay;
+    if (mood !== undefined) entry.mood = mood;
+    if (activity !== undefined) entry.activity = activity;
+    if (messageToSelf !== undefined) entry.messageToSelf = messageToSelf;
     if (content !== undefined) {
       entry.content = content;
       entry.excerpt = excerpt || htmlToExcerpt(content);

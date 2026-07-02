@@ -103,6 +103,12 @@ export default function EntryView() {
           <p className="text-gray-600">
             <time dateTime={entry.entryDate}>{formatDate(entry.entryDate)}</time>
           </p>
+          {(entry.mood || entry.activity) && (
+            <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-700">
+              {entry.mood && <span className="px-3 py-1 bg-yellow-100 rounded-full">Mood: {entry.mood}</span>}
+              {entry.activity && <span className="px-3 py-1 bg-slate-100 rounded-full">Activity: {entry.activity}</span>}
+            </div>
+          )}
         </header>
 
         {/* ------------------------------------------------------ */}
