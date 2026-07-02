@@ -76,9 +76,9 @@ function Header() {
           <Link to="/new" className="hover:bg-gray-100 hover:font-bold px-3 py-2 rounded">
             New Entry
           </Link>
-          <button className="hover:bg-gray-100 hover:font-bold px-3 py-2 rounded">
+          <Link to="/stickers" className="hover:bg-gray-100 hover:font-bold px-3 py-2 rounded">
             Sticker Factory
-          </button>
+          </Link>
           <button className="hover:bg-gray-100 hover:font-bold px-3 py-2 rounded">
             Scan Diary
           </button>

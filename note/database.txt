@@ -1,0 +1,6 @@
+c241488_db_user
+OXqPxC7UOwiCLuRS
+
+mongodb+srv://c241488_db_user:OXqPxC7UOwiCLuRS@diary.93vu2m6.mongodb.net/
+
+node dbConnect.js

@@ -2,14 +2,18 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 // Firebase client SDK configuration
+// Import the functions 
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+  apiKey: "AIzaSyCa8ZDj8bWWDBzfgwntZgl_FaX9IAxBtHU",
+  authDomain: "dear-diary-dd.firebaseapp.com",
+  projectId: "dear-diary-dd",
+  storageBucket: "dear-diary-dd.firebasestorage.app",
+  messagingSenderId: "517968173757",
+  appId: "1:517968173757:web:1a1eba462c9bc97c5875d4",
+  measurementId: "G-H099LJHX9N"
 };
+
 
 // Verify if the config is present
 const isConfigured = firebaseConfig.apiKey && firebaseConfig.projectId;

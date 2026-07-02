@@ -77,7 +77,7 @@ export default function BookDupe() {
               </div>
               
               <div className="cover-emboss">M</div>
-              <p className="text-xs text-[#ffe494] opacity-50 tracking-widest uppercase">Est. 2026</p>
+              <p className="text-xs text-[#ffe494] opacity-50 tracking-widest uppercase">Mayesha</p>  {/*Show Username*/}
             </div>
 
             {/* Back: Page 1 (Welcome Page) */}
@@ -86,7 +86,7 @@ export default function BookDupe() {
                 <div className="diary-date">June 19, 2026</div>
                 <div className="diary-text">
                   <div className="washi-tape" style={{ top: '15px', right: '35px', transform: 'rotate(4deg)', background: '#d4edda' }}>
-                    Welcome! ✨
+                    My Day! 
                   </div>
                   <p className="mt-8">Hello there!</p>
                   <p className="mt-2">

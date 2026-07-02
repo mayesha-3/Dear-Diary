@@ -1,11 +1,9 @@
+// backend/models/Entry.js
 import mongoose from 'mongoose';
 
-// A single sticker placed on the page.
-// x / y are stored as PERCENTAGES (0-100) of the page container's
-// width/height so the sticker's position stays correct regardless
-// of screen size. "fixed position on page" + "in front of text" is
-// achieved on the front end via position: absolute + a z-index that
-// is always higher than the text layer.
+// A single sticker placed on a diary page.
+// x / y are percentages (0-100) of the page container so the
+// sticker position stays correct across different screen sizes.
 const StickerSchema = new mongoose.Schema(
   {
     stickerId: {
@@ -14,7 +12,7 @@ const StickerSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
-      required: true, // url returned by the /api/upload route
+      required: true, // url returned by /api/upload
     },
     x: {
       type: Number, // left position, % of container width
@@ -36,7 +34,7 @@ const StickerSchema = new mongoose.Schema(
     },
     zIndex: {
       type: Number,
-      default: 10, // higher than the text layer's z-index
+      default: 10,
     },
   },
   { _id: false }
@@ -44,9 +42,9 @@ const StickerSchema = new mongoose.Schema(
 
 const EntrySchema = new mongoose.Schema(
   {
+    // Firebase UID — NOT a Mongoose ObjectId, since Firebase is the auth source
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
       required: true,
       index: true,
     },
@@ -60,8 +58,7 @@ const EntrySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Plain-text version of content, kept in sync on save.
-    // Used for list previews / search without re-parsing HTML.
+    // Plain-text excerpt of content — used for list previews & search
     excerpt: {
       type: String,
       default: '',
@@ -74,8 +71,7 @@ const EntrySchema = new mongoose.Schema(
       imageUrl: { type: String, default: null },
       enabled: { type: Boolean, default: false },
     },
-    // The diary date this entry belongs to (user-editable,
-    // defaults to "now" but can be backdated).
+    // The diary date this entry belongs to (user-editable, defaults to now)
     entryDate: {
       type: Date,
       required: true,
@@ -85,7 +81,10 @@ const EntrySchema = new mongoose.Schema(
   { timestamps: true } // adds createdAt / updatedAt
 );
 
-// Helpful for the "Past Entries" page: newest first.
+// Compound index: newest entries first per user
 EntrySchema.index({ user: 1, entryDate: -1 });
+
+// Text index for full-text search on title + excerpt
+EntrySchema.index({ title: 'text', excerpt: 'text' });
 
 export default mongoose.model('Entry', EntrySchema);

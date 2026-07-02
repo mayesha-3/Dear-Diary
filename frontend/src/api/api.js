@@ -4,7 +4,7 @@ import { auth } from '../firebase';
 // Centralised axios instance. Adjust baseURL via your .env
 // (e.g. VITE_API_URL=http://localhost:5100/api)
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5100/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
 });
 
 // Attach Firebase Auth ID token automatically to requests
@@ -13,12 +13,20 @@ api.interceptors.request.use(
     const user = auth.currentUser;
     if (user) {
       try {
-        // Force refresh if the token is close to expiry
-        const token = await user.getIdToken(false);
+        // Try to use a fresh token so expired tokens do not fail requests.
+        const token = await user.getIdToken(true);
         config.headers.Authorization = `Bearer ${token}`;
-      } catch (err) {
-        console.error('Failed to attach Firebase auth token to request:', err);
+      } catch (refreshErr) {
+        console.warn('Failed to refresh Firebase auth token, falling back to cached token:', refreshErr);
+        try {
+          const token = await user.getIdToken(false);
+          config.headers.Authorization = `Bearer ${token}`;
+        } catch (err) {
+          console.error('Failed to attach Firebase auth token to request:', err);
+        }
       }
+    } else {
+      console.warn('No Firebase user is signed in for request to', config.url);
     }
     return config;
   },

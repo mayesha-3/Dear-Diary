@@ -17,6 +17,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "firebase-admin": "^14.0.0",
+    "mongoose": "^9.7.2",
+    "mongosh": "^2.8.3",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14"
   }

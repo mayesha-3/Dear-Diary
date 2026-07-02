@@ -1,0 +1,365 @@
+/* PastEntries Calendar Styles */
+
+.cal-page {
+  min-height: 100vh;
+  padding: 2rem 1.5rem 4rem;
+  font-family: var(--sans, 'Patrick Hand', cursive);
+  color: var(--text, #4a3c2a);
+}
+
+/* ── Header bar ─────────────────────────────── */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cal-header h1 {
+  font-family: var(--heading, 'Shadows Into Light', cursive);
+  font-size: 2.6rem;
+  margin: 0;
+  color: var(--text-h, #2b1d0e);
+}
+
+.cal-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.3rem;
+  background: #c97b63;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--sans, cursive);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 3px 10px rgba(201,123,99,0.35);
+}
+.cal-new-btn:hover {
+  background: #b56b53;
+  transform: translateY(-1px);
+}
+
+/* ── Month/Year navigator ───────────────────── */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.8rem;
+}
+
+.cal-nav-arrow {
+  width: 36px;
+  height: 36px;
+  background: rgba(201,123,99,0.12);
+  border: 1.5px solid rgba(201,123,99,0.3);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, transform 0.15s;
+  color: #c97b63;
+}
+.cal-nav-arrow:hover {
+  background: rgba(201,123,99,0.22);
+  transform: scale(1.1);
+}
+
+.cal-selects {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cal-select {
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid var(--border, #d9cbb3);
+  border-radius: 8px;
+  background: rgba(255,253,248,0.95);
+  font-family: var(--heading, cursive);
+  font-size: 1.15rem;
+  color: var(--text-h, #2b1d0e);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.18s;
+  appearance: auto;
+}
+.cal-select:focus {
+  border-color: #c97b63;
+}
+
+.cal-month-label {
+  font-family: var(--heading, 'Shadows Into Light', cursive);
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--text-h, #2b1d0e);
+  min-width: 200px;
+  text-align: center;
+}
+
+/* ── Weekday row ────────────────────────────── */
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.cal-weekday {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c97b63;
+  padding: 0.3rem 0;
+}
+
+/* ── Calendar grid ──────────────────────────── */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+/* ── Individual day cell ────────────────────── */
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  cursor: default;
+  background: rgba(255,253,248,0.6);
+  min-height: 72px;
+}
+
+.cal-day.has-entry {
+  cursor: pointer;
+  border-color: rgba(201,123,99,0.25);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.cal-day.has-entry:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: #c97b63;
+  box-shadow: 0 6px 18px rgba(201,123,99,0.28);
+  z-index: 5;
+}
+
+.cal-day.empty-day {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cal-day.today .cal-day-num {
+  background: #c97b63;
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* ── Background image fill ──────────────────── */
+.cal-day-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  border-radius: 11px;
+  transition: opacity 0.3s;
+}
+
+/* Gradient overlay to keep number readable */
+.cal-day-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.18) 0%,
+    rgba(0,0,0,0) 40%,
+    rgba(0,0,0,0.38) 100%
+  );
+  border-radius: 11px;
+}
+
+/* No image: soft paper pattern */
+.cal-day:not(.has-entry) {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,253,248,0.9),
+    rgba(255,253,248,0.9) 14px,
+    rgba(220,210,195,0.25) 15px
+  );
+}
+
+/* ── Day number badge ───────────────────────── */
+.cal-day-num {
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-h, #2b1d0e);
+  z-index: 2;
+  line-height: 1;
+}
+
+.has-entry .cal-day-num {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* ── Entry indicator dot ────────────────────── */
+.cal-entry-dot {
+  position: absolute;
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cal-entry-dot span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+  display: block;
+}
+
+/* ── Entry title tooltip on hover ───────────── */
+.cal-day-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(43,29,14,0.92);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+  transition: opacity 0.18s;
+  backdrop-filter: blur(4px);
+}
+
+.cal-day-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(43,29,14,0.92);
+}
+
+.cal-day.has-entry:hover .cal-day-tooltip {
+  opacity: 1;
+}
+
+/* ── Pic of the Day banner ──────────────────── */
+.cal-potd {
+  margin-bottom: 2rem;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #f5e6d3, #e8d5c4);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(201,123,99,0.2);
+  border: 1.5px solid rgba(201,123,99,0.25);
+}
+
+.cal-potd-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 3px solid #fff;
+}
+
+.cal-potd-info h3 {
+  font-family: var(--heading, cursive);
+  font-size: 1.3rem;
+  margin: 0 0 0.25rem;
+  color: var(--text-h, #2b1d0e);
+}
+
+.cal-potd-info p {
+  font-size: 0.82rem;
+  color: #8c7355;
+  margin: 0 0 0.5rem;
+}
+
+.cal-potd-link {
+  font-size: 0.82rem;
+  color: #c97b63;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.18s;
+}
+.cal-potd-link:hover { color: #a05a43; text-decoration: underline; }
+
+.cal-potd-badge {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #c97b63;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+/* ── Loading/error/empty states ─────────────── */
+.cal-status {
+  text-align: center;
+  padding: 3rem;
+  font-family: var(--heading, cursive);
+  font-size: 1.4rem;
+  color: #8c7355;
+}
+
+.cal-status.error {
+  color: #b94242;
+}
+
+/* ── Responsive ─────────────────────────────── */
+@media (max-width: 640px) {
+  .cal-grid { gap: 4px; }
+  .cal-day { min-height: 50px; border-radius: 8px; }
+  .cal-header h1 { font-size: 2rem; }
+  .cal-month-label { font-size: 1.25rem; min-width: 160px; }
+  .cal-potd { flex-direction: column; text-align: center; }
+}

@@ -91,3 +91,13 @@ code {
   color: var(--text-h);
 }
 
+/* Fix for pages that are flipped in 3D book layout: ensure content editable areas
+   are not visually mirrored and use left-to-right text direction. */
+.face-back [contenteditable], .page-face.face-back [contenteditable], .page-card.flipped-card [contenteditable] {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  backface-visibility: hidden;
+}
+

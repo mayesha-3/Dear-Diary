@@ -9,14 +9,15 @@ import BookDupe from "./components/BookDupe";
 import NewEntry from "./components/NewEntry";
 import PastEntries from "./components/PastEntries";
 import EntryView from "./components/EntryView";
+import StickerFactory from "./components/StickerFactory";
 import Auth from "./components/Auth";
 
 function Home() {
   return (
     <main className="p-4">
       <p className="text-lg text-gray-700">
-        Welcome to Dear Diary, your personal journaling app. Start writing your
-        thoughts and memories today!
+        Welcome to Dear Diary, your personal journaling app. <br />
+        Write all your thoughts, feelings, and experiences in a safe and private space.
       </p>
       <br />
       <br />
@@ -69,6 +70,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/new" element={<NewEntry />} />
           <Route path="/entries" element={<PastEntries />} />
+          <Route path="/stickers" element={<StickerFactory />} />
           <Route path="/entry/:id" element={<EntryView />} />
         </Routes>
         <Footer />

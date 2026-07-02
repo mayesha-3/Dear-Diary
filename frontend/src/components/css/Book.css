@@ -108,7 +108,7 @@
 
 /* --- Cover styling --- */
 .leather-cover {
-  background: radial-gradient(circle at 30% 30%, #5d3e26, #3d2412);
+  background: radial-gradient(circle at 30% 30%, #7e3838, #663e21);
   border: 8px double #d4af37;
   color: #d4af37;
   display: flex;
@@ -312,7 +312,7 @@
 .ribbon-bookmark {
   position: absolute;
   top: -10px;
-  left: 48%;
+  left: 8%;
   width: 16px;
   height: 120%;
   background: linear-gradient(to right, #ba4b42, #8b231c);

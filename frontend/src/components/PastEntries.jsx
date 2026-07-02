@@ -1,52 +1,78 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/api';
+import './css/Calendar.css';
 
-const ASSET_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5100/api').replace(/\/api\/?$/, '');
+/* ─────────────────────────────────────────────────────────── */
+/*  Constants & helpers                                        */
+/* ─────────────────────────────────────────────────────────── */
 
-function resolveAssetUrl(url) {
-  if (!url) return url;
-  return url.startsWith('http') ? url : `${ASSET_BASE_URL}${url}`;
+const ASSET_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace(/\/api\/?$/, '');
+
+function resolveUrl(url) {
+  if (!url) return null;
+  return url.startsWith('http') ? url : `${ASSET_BASE}${url}`;
 }
 
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(undefined, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+const MONTHS = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+];
+
+const WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+/** Returns "YYYY-MM-DD" for a Date object in local time */
+function toLocalDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Pretty format for the POTD date line */
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString(undefined, {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 }
 
+/** Year options: current year ± 5 */
+function yearRange() {
+  const now = new Date().getFullYear();
+  const years = [];
+  for (let y = now - 5; y <= now + 1; y++) years.push(y);
+  return years;
+}
+
+/* ─────────────────────────────────────────────────────────── */
+/*  Component                                                  */
+/* ─────────────────────────────────────────────────────────── */
+
 export default function PastEntries() {
   const navigate = useNavigate();
+  const today = new Date();
 
-  const [entries, setEntries] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  /* ── Calendar navigation state ─────────────── */
+  const [viewYear,  setViewYear]  = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
 
-  const [picOfDay, setPicOfDay] = useState(null);
+  /* ── Data state ─────────────────────────────── */
+  const [allEntries, setAllEntries] = useState([]); // full list (up to 500)
+  const [picOfDay,   setPicOfDay]   = useState(null);
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState('');
 
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [deletingId, setDeletingId] = useState(null);
-
-  const loadEntries = useCallback(async (pageToLoad, searchTerm) => {
+  /* ── Load all entries once ───────────────────── */
+  const loadAll = useCallback(async () => {
     setLoading(true);
-    setErrorMsg('');
+    setError('');
     try {
-      const res = await api.get('/entries', {
-        params: { page: pageToLoad, limit: 10, search: searchTerm || undefined },
-      });
-      setEntries(res.data.entries);
-      setTotalPages(res.data.totalPages);
-      setPage(res.data.page);
+      // Fetch up to 500 entries so we can show all months without re-fetching
+      const res = await api.get('/entries', { params: { page: 1, limit: 500 } });
+      setAllEntries(res.data.entries || []);
     } catch (err) {
       console.error(err);
-      setErrorMsg('Could not load your past entries. Please try again.');
+      setError('Could not load your entries. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -56,181 +82,211 @@ export default function PastEntries() {
     try {
       const res = await api.get('/entries/pic-of-the-day');
       setPicOfDay(res.data.picOfTheDay);
-    } catch (err) {
-      // Non-critical — fail quietly so it doesn't block the page
-      console.error(err);
-    }
+    } catch { /* non-critical */ }
   }, []);
 
   useEffect(() => {
-    loadEntries(1, '');
+    loadAll();
     loadPicOfDay();
-  }, [loadEntries, loadPicOfDay]);
+  }, [loadAll, loadPicOfDay]);
 
-  const handleSearchSubmit = useCallback(
-    (e) => {
-      e.preventDefault();
-      setSearch(searchInput);
-      loadEntries(1, searchInput);
-    },
-    [searchInput, loadEntries]
-  );
+  /* ── Build a lookup: "YYYY-MM-DD" → entry ────── */
+  const entryByDate = useMemo(() => {
+    const map = {};
+    allEntries.forEach(e => {
+      const key = toLocalDateKey(new Date(e.entryDate));
+      // keep the first/most-recent entry for a given date
+      if (!map[key]) map[key] = e;
+    });
+    return map;
+  }, [allEntries]);
 
-  const handleClearSearch = useCallback(() => {
-    setSearchInput('');
-    setSearch('');
-    loadEntries(1, '');
-  }, [loadEntries]);
+  /* ── Build calendar grid for the current view ── */
+  const calendarDays = useMemo(() => {
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const cells = [];
 
-  const goToPage = useCallback(
-    (nextPage) => {
-      if (nextPage < 1 || nextPage > totalPages) return;
-      loadEntries(nextPage, search);
-    },
-    [loadEntries, search, totalPages]
-  );
+    // Leading empty cells
+    for (let i = 0; i < firstDay; i++) cells.push(null);
 
-  const handleDelete = useCallback(
-    async (entryId) => {
-      const confirmed = window.confirm('Delete this entry? This cannot be undone.');
-      if (!confirmed) return;
+    // Day cells
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      cells.push({ day: d, key, entry: entryByDate[key] || null });
+    }
+    return cells;
+  }, [viewYear, viewMonth, entryByDate]);
 
-      setDeletingId(entryId);
-      try {
-        await api.delete(`/entries/${entryId}`);
-        setEntries((prev) => prev.filter((e) => e._id !== entryId));
-      } catch (err) {
-        console.error(err);
-        setErrorMsg('Failed to delete entry.');
-      } finally {
-        setDeletingId(null);
-      }
-    },
-    []
-  );
+  /* ── Nav helpers ─────────────────────────────── */
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  };
 
+  const todayKey = toLocalDateKey(today);
+
+  /* ─────────────────────────────────────────────── */
+  /*  Render                                         */
+  /* ─────────────────────────────────────────────── */
   return (
-    <main className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Past Entries</h1>
+    <main className="cal-page">
 
-      {/* New Entry Button */}
-      <Link to="/new" className="inline-block px-6 py-2 bg-gray-600 text-white rounded font-semibold hover:bg-gray-700 mb-6">
-        ✎ New Entry
-      </Link>
+      {/* ── Top header ──────────────────────────── */}
+      <div className="cal-header">
+        <h1>My Diary</h1>
+        <Link to="/new" className="cal-new-btn">✎ New Entry</Link>
+      </div>
 
-      {/* Pic of the Day */}
+      {/* ── Pic of the Day ──────────────────────── */}
       {picOfDay && (
-        <section className="bg-gradient-to-r from-purple-100 to-blue-100 p-6 rounded-lg mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Pic of the Day</h2>
-          <div className="flex gap-4">
-            <img src={resolveAssetUrl(picOfDay.imageUrl)} alt="Pic of day" className="w-48 h-48 object-cover rounded" />
-            <div>
-              <p className="text-gray-700 mb-2">
-                <strong>{picOfDay.entryTitle}</strong>
-              </p>
-              <p className="text-sm text-gray-600 mb-4">{formatDate(picOfDay.entryDate)}</p>
-              <Link
-                to={`/entry/${picOfDay.entryId}`}
-                className="text-gray-600 hover:underline"
-              >
-                Read full entry →
-              </Link>
-            </div>
+        <section className="cal-potd">
+          <span className="cal-potd-badge">📸 Pic of the Day</span>
+          <img
+            className="cal-potd-img"
+            src={resolveUrl(picOfDay.imageUrl)}
+            alt={picOfDay.entryTitle}
+          />
+          <div className="cal-potd-info">
+            <h3>{picOfDay.entryTitle}</h3>
+            <p>{formatDate(picOfDay.entryDate)}</p>
+            <Link className="cal-potd-link" to={`/entry/${picOfDay.entryId}`}>
+              Read full entry →
+            </Link>
           </div>
         </section>
       )}
 
-      {/* Search */}
-      <form onSubmit={handleSearchSubmit} className="mb-6 flex gap-2">
-        <input
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Search entries..."
-          className="flex-1 px-4 py-2 border rounded"
-        />
-        <button type="submit" className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-          Search
-        </button>
-        {search && (
-          <button
-            type="button"
-            onClick={handleClearSearch}
-            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+      {/* ── Month / Year navigator ──────────────── */}
+      <div className="cal-nav">
+        <button
+          className="cal-nav-arrow"
+          onClick={prevMonth}
+          aria-label="Previous month"
+          id="cal-prev-month"
+        >‹</button>
+
+        <div className="cal-selects">
+          <select
+            id="cal-month-select"
+            className="cal-select"
+            value={viewMonth}
+            onChange={e => setViewMonth(Number(e.target.value))}
           >
-            Clear
-          </button>
-        )}
-      </form>
+            {MONTHS.map((m, i) => (
+              <option key={m} value={i}>{m}</option>
+            ))}
+          </select>
 
-      {errorMsg && <div className="bg-red-100 text-red-700 p-4 rounded mb-4">{errorMsg}</div>}
+          <select
+            id="cal-year-select"
+            className="cal-select"
+            value={viewYear}
+            onChange={e => setViewYear(Number(e.target.value))}
+          >
+            {yearRange().map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
 
-      {/* Entries List */}
-      {loading ? (
-        <p className="text-gray-600">Loading entries...</p>
-      ) : entries.length === 0 ? (
-        <p className="text-gray-600">No entries found. Start writing your first entry!</p>
-      ) : (
-        <div className="space-y-4">
-          {entries.map((entry) => (
-            <div key={entry._id} className="border rounded-lg p-4 hover:bg-gray-50 transition">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-600 hover:text-gray-800">
-                    <Link to={`/entry/${entry._id}`}>{entry.title}</Link>
-                  </h3>
-                  <p className="text-sm text-gray-500 mb-2">{formatDate(entry.entryDate)}</p>
-                  <p className="text-gray-700">{entry.excerpt}</p>
+        <button
+          className="cal-nav-arrow"
+          onClick={nextMonth}
+          aria-label="Next month"
+          id="cal-next-month"
+        >›</button>
+      </div>
+
+      {/* ── Loading / Error states ───────────────── */}
+      {loading && <p className="cal-status">Loading your diary...</p>}
+      {error   && <p className="cal-status error">{error}</p>}
+
+      {!loading && !error && (
+        <>
+          {/* ── Weekday headers ───────────────────── */}
+          <div className="cal-weekdays">
+            {WEEKDAYS.map(d => (
+              <div key={d} className="cal-weekday">{d}</div>
+            ))}
+          </div>
+
+          {/* ── Calendar grid ─────────────────────── */}
+          <div className="cal-grid" role="grid" aria-label="Diary calendar">
+            {calendarDays.map((cell, idx) => {
+              if (!cell) {
+                return <div key={`empty-${idx}`} className="cal-day empty-day" aria-hidden="true" />;
+              }
+
+              const { day, key, entry } = cell;
+              const isToday = key === todayKey;
+              const imgUrl  = entry?.picOfTheDay?.imageUrl
+                ? resolveUrl(entry.picOfTheDay.imageUrl)
+                : null;
+
+              const classes = [
+                'cal-day',
+                entry   ? 'has-entry' : '',
+                isToday ? 'today'     : '',
+              ].filter(Boolean).join(' ');
+
+              return (
+                <div
+                  key={key}
+                  id={`cal-day-${key}`}
+                  className={classes}
+                  role={entry ? 'button' : 'gridcell'}
+                  tabIndex={entry ? 0 : -1}
+                  aria-label={entry ? `${day}: ${entry.title}` : `${day}`}
+                  onClick={() => entry && navigate(`/entry/${entry._id}`)}
+                  onKeyDown={e => e.key === 'Enter' && entry && navigate(`/entry/${entry._id}`)}
+                >
+                  {/* Background image (pic of the day) */}
+                  {imgUrl && (
+                    <>
+                      <div
+                        className="cal-day-bg"
+                        style={{ backgroundImage: `url(${imgUrl})` }}
+                      />
+                      <div className="cal-day-overlay" />
+                    </>
+                  )}
+
+                  {/* Day number */}
+                  <span className="cal-day-num">{day}</span>
+
+                  {/* Entry indicator dots */}
+                  {entry && (
+                    <div className="cal-entry-dot">
+                      <span />
+                    </div>
+                  )}
+
+                  {/* Hover tooltip */}
+                  {entry && (
+                    <div className="cal-day-tooltip">
+                      {entry.title}
+                    </div>
+                  )}
                 </div>
-                {entry.picOfTheDay?.imageUrl && (
-                  <img
-                    src={resolveAssetUrl(entry.picOfTheDay.imageUrl)}
-                    alt={entry.title}
-                    className="w-20 h-20 object-cover rounded ml-4"
-                  />
-                )}
-              </div>
-              <div className="mt-3 flex gap-2">
-                <Link
-                  to={`/entry/${entry._id}`}
-                  className="text-gray-600 hover:underline text-sm"
-                >
-                  Read More
-                </Link>
-                <button
-                  onClick={() => handleDelete(entry._id)}
-                  disabled={deletingId === entry._id}
-                  className="text-red-600 hover:underline text-sm disabled:text-gray-400"
-                >
-                  {deletingId === entry._id ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex justify-center gap-2">
-          <button
-            onClick={() => goToPage(page - 1)}
-            disabled={page === 1}
-            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
-          >
-            ← Previous
-          </button>
-          <span className="px-4 py-2">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            onClick={() => goToPage(page + 1)}
-            disabled={page === totalPages}
-            className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
-          >
-            Next →
-          </button>
-        </div>
+          {/* ── Empty month message ───────────────── */}
+          {calendarDays.every(c => !c?.entry) && (
+            <p className="cal-status" style={{ marginTop: '2rem' }}>
+              No entries for {MONTHS[viewMonth]} {viewYear} —{' '}
+              <Link to="/new" style={{ color: '#c97b63', fontWeight: 700 }}>
+                write one now!
+              </Link>
+            </p>
+          )}
+        </>
       )}
     </main>
   );
