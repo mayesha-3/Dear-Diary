@@ -72,9 +72,7 @@ export default function EntryView() {
         <p role="alert" className="text-red-600">
           {errorMsg || "Entry not found."}
         </p>
-        <Link
-          to="/entries"
-          className="text-blue-600 hover:underline mt-4 block">
+        <Link to="/entries" className="text-[#c97b63] hover:underline mt-4 block">
           Back to Past Entries
         </Link>
       </main>
@@ -85,7 +83,7 @@ export default function EntryView() {
     <main className="container mx-auto p-6">
       <section>
         <nav className="mb-6 flex justify-between items-center">
-          <Link to="/entries" className="text-blue-600 hover:underline">
+          <Link to="/entries" className="text-[#c97b63] hover:underline">
             ← Back to Past Entries
           </Link>
           <Link

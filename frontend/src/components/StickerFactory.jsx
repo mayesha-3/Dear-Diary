@@ -37,7 +37,7 @@ export default function StickerFactory() {
   const [drawPaths, setDrawPaths] = useState([]);
   const [history, setHistory] = useState([]);
   const [currentPath, setCurrentPath] = useState(null);
-  const [brushColor, setBrushColor] = useState("#1d4ed8");
+  const [brushColor, setBrushColor] = useState("#1f2937");
   const [brushSize, setBrushSize] = useState(8);
   const [mode, setMode] = useState("brush");
   const [selectedLayerId, setSelectedLayerId] = useState(null);
@@ -59,7 +59,7 @@ export default function StickerFactory() {
       if (layer.type === "image" && layer.image) {
         ctx.drawImage(layer.image, layer.x, layer.y, layer.width, layer.height);
         if (layer.id === selectedLayerId) {
-          ctx.strokeStyle = "#2563eb";
+          ctx.strokeStyle = "#1f2937";
           ctx.lineWidth = 2;
           ctx.strokeRect(
             layer.x - 2,
@@ -69,7 +69,7 @@ export default function StickerFactory() {
           );
           // draw resize handle (bottom-right)
           ctx.fillStyle = "#fff";
-          ctx.strokeStyle = "#2563eb";
+          ctx.strokeStyle = "#1f2937";
           ctx.lineWidth = 1;
           const hx = layer.x + layer.width - HANDLE_SIZE / 2;
           const hy = layer.y + layer.height - HANDLE_SIZE / 2;
@@ -398,27 +398,21 @@ export default function StickerFactory() {
             <button
               type="button"
               onClick={() => setMode("brush")}
-              className="flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all"
-              style={{
-                background:
-                  mode === "brush"
-                    ? "var(--accent-strong, #5b7cff)"
-                    : "transparent",
-                color: mode === "brush" ? "#ffffff" : "var(--text-muted)",
-              }}>
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+                mode === "brush"
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
               🎨 Paintbrush
             </button>
             <button
               type="button"
               onClick={() => setMode("move")}
-              className="flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all"
-              style={{
-                background:
-                  mode === "move"
-                    ? "var(--accent-strong, #5b7cff)"
-                    : "transparent",
-                color: mode === "move" ? "#ffffff" : "var(--text-muted)",
-              }}>
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded-lg transition-all ${
+                mode === "move"
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}>
               🖐️ Move Layer
             </button>
           </div>
@@ -461,7 +455,7 @@ export default function StickerFactory() {
                 max="24"
                 value={brushSize}
                 onChange={(e) => setBrushSize(Number(e.target.value))}
-                className="w-full accent-[#5b7cff]"
+                className="w-full accent-gray-800"
               />
             </div>
 
@@ -476,7 +470,7 @@ export default function StickerFactory() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#5b7cff] file:text-white hover:file:opacity-90 cursor-pointer"
+                className="w-full text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 cursor-pointer"
                 style={{ color: "var(--text-muted)" }}
               />
             </div>
@@ -522,8 +516,7 @@ export default function StickerFactory() {
                 type="button"
                 disabled={saving}
                 onClick={handleSaveSticker}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white shadow-lg transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
-                style={{ background: "var(--accent-strong, #10b981)" }}>
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gray-800 hover:bg-gray-700 shadow-lg transition-all active:scale-95 disabled:opacity-50">
                 {saving ? "Saving..." : "✨ Save Sticker"}
               </button>
             </div>
@@ -583,7 +576,7 @@ export default function StickerFactory() {
                         width: Number(e.target.value),
                       })
                     }
-                    className="w-full accent-[#5b7cff]"
+                    className="w-full accent-gray-800"
                   />
                 </div>
                 <div>
@@ -605,7 +598,7 @@ export default function StickerFactory() {
                         height: Number(e.target.value),
                       })
                     }
-                    className="w-full accent-[#5b7cff]"
+                    className="w-full accent-gray-800"
                   />
                 </div>
                 <div>
@@ -627,7 +620,7 @@ export default function StickerFactory() {
                         rotation: Number(e.target.value),
                       })
                     }
-                    className="w-full accent-[#5b7cff]"
+                    className="w-full accent-gray-800"
                   />
                 </div>
               </div>

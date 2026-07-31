@@ -478,8 +478,8 @@ export default function EditEntry() {
         </div>
 
         {/* NEW: PDF Document Scanning Component */}
-        <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
-          <label className="block text-sm font-semibold text-blue-900 mb-2">
+        <div className="bg-blue-50 border border-orange-200 p-4 rounded-md">
+          <label className="block text-sm font-semibold text-[#c97b63] mb-2">
             ✨ Autofill via PDF Scan
           </label>
           <input
@@ -490,7 +490,7 @@ export default function EditEntry() {
             className="block text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-white hover:file:bg-blue-800 disabled:opacity-50"
           />
           {pdfScanning && (
-            <p className="text-xs font-medium text-blue-700 mt-2 animate-pulse">
+            <p className="text-xs font-medium text-[#c97b63] mt-2 animate-pulse">
               Running Python AI pipeline... reading PDF data...
             </p>
           )}
@@ -537,7 +537,7 @@ export default function EditEntry() {
                   style={{ direction: "ltr", unicodeBidi: "plaintext" }}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-[#c97b63] mt-2">
                 Paste images (Ctrl/Cmd+V) to insert stickers directly.
               </p>
             </div>
@@ -595,7 +595,7 @@ export default function EditEntry() {
                       }
                     }}
                   />
-                  <div className="text-xs text-slate-500 mt-2">
+                  <div className="text-xs text-[#c97b63] mt-2">
                     Click an inline image to select it and adjust size.
                   </div>
                 </div>
@@ -616,7 +616,7 @@ export default function EditEntry() {
             <div className="absolute -top-2 right-2 text-3xl">✂️</div>
             <div className="absolute bottom-2 right-2 text-3xl">🖇️</div>
 
-            <div className="border-2 border-gray-300 rounded-3xl p-4 bg-white">
+            <div className="border-2 text-[#c97b63] rounded-3xl p-4 bg-white">
               {picOfDay.imageUrl ? (
                 <img
                   src={resolveAssetUrl(picOfDay.imageUrl)}
@@ -723,7 +723,7 @@ export default function EditEntry() {
                   key={sticker.stickerId}
                   onMouseDown={(e) => handleMouseDown(e, sticker.stickerId)}
                   onClick={() => setSelectedStickerId(sticker.stickerId)}
-                  className={`absolute cursor-move ${selectedStickerId === sticker.stickerId ? "ring-2 ring-blue-500" : ""}`}
+                  className={`absolute cursor-move ${selectedStickerId === sticker.stickerId ? "ring-2 text-[#c97b63]" : ""}`}
                   style={{
                     left: `${sticker.x}%`,
                     top: `${sticker.y}%`,
@@ -810,7 +810,7 @@ export default function EditEntry() {
                         <button
                           type="button"
                           onClick={() => handleSidebarInsert(stk)}
-                          className="px-2 py-1 bg-blue-600 text-white rounded text-xs">
+                          className="px-2 py-1 text-[#c97b63] text-white rounded text-xs">
                           Insert
                         </button>
                         <button

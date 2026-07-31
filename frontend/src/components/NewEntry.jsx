@@ -491,13 +491,13 @@ export default function NewEntry() {
             accept="application/pdf"
             onChange={handlePdfScan}
             disabled={pdfScanning}
-            className="block text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#5b7cff] file:text-white hover:file:opacity-90 disabled:opacity-50 cursor-pointer"
+            className="block text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 disabled:opacity-50 cursor-pointer"
             style={{ color: "var(--text-muted)" }}
           />
           {pdfScanning && (
             <p
               className="text-xs font-medium mt-2 animate-pulse"
-              style={{ color: "var(--accent-2)" }}>
+              style={{ color: "inherit" }}>
               Running Python AI pipeline... reading PDF data...
             </p>
           )}
@@ -597,7 +597,7 @@ export default function NewEntry() {
                       name="insertMode"
                       checked={insertMode === "inline"}
                       onChange={() => setInsertMode("inline")}
-                      className="accent-[#5b7cff]"
+                      className="ring-gray-300"
                     />
                     <span className="ml-2">Inline</span>
                   </label>
@@ -609,7 +609,7 @@ export default function NewEntry() {
                       name="insertMode"
                       checked={insertMode === "behind"}
                       onChange={() => setInsertMode("behind")}
-                      className="accent-[#5b7cff]"
+                      className="ring-gray-300"
                     />
                     <span className="ml-2">Behind</span>
                   </label>
@@ -645,7 +645,7 @@ export default function NewEntry() {
                         setContent(contentRef.current.innerHTML);
                       }
                     }}
-                    className="w-full accent-[#5b7cff]"
+                    className="w-full ring-gray-300"
                   />
                 </div>
               )}
@@ -691,7 +691,7 @@ export default function NewEntry() {
                 accept="image/*"
                 onChange={handlePicOfDayChange}
                 disabled={picUploading}
-                className="mt-4 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#5b7cff] file:text-white hover:file:opacity-90 disabled:opacity-50 cursor-pointer"
+                className="mt-4 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 disabled:opacity-50 cursor-pointer"
                 style={{ color: "var(--text-muted)" }}
               />
             </div>
@@ -727,9 +727,7 @@ export default function NewEntry() {
                       className="px-4 py-2 rounded-full border text-sm font-medium transition-colors"
                       style={{
                         borderColor: "var(--border)",
-                        background: active
-                          ? "var(--accent-strong)"
-                          : "var(--surface-3)",
+                        background: active ? "#1f2937" : "var(--surface-3)",
                         color: active ? "#ffffff" : "var(--text)",
                       }}>
                       {label}
@@ -777,7 +775,7 @@ export default function NewEntry() {
             accept="image/*"
             onChange={handleStickerUpload}
             disabled={stickerUploading}
-            className="px-4 py-2 border rounded-full text-sm file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-[#5b7cff] file:text-white cursor-pointer"
+            className="px-4 py-2 border rounded-full text-sm file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-gray-800 file:text-white hover:file:bg-gray-700 cursor-pointer"
             style={{
               background: "var(--surface-2)",
               color: "var(--text)",
@@ -814,7 +812,7 @@ export default function NewEntry() {
                   key={sticker.stickerId}
                   onMouseDown={(e) => handleMouseDown(e, sticker.stickerId)}
                   onClick={() => setSelectedStickerId(sticker.stickerId)}
-                  className={`absolute cursor-move ${selectedStickerId === sticker.stickerId ? "ring-2 ring-blue-500" : ""}`}
+                  className={`absolute cursor-move ${selectedStickerId === sticker.stickerId ? "ring-2 ring-gray-300" : ""}`}
                   style={{
                     left: `${sticker.x}%`,
                     top: `${sticker.y}%`,
@@ -866,7 +864,7 @@ export default function NewEntry() {
           type="submit"
           disabled={saving}
           className="w-full px-6 py-3 rounded-full font-semibold shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99]"
-          style={{ background: "var(--accent-strong)", color: "#ffffff" }}>
+          style={{ background: "#1f2937", color: "#ffffff" }}>
           {saving ? "Saving..." : "Save Entry"}
         </button>
 
@@ -920,7 +918,7 @@ export default function NewEntry() {
                         <button
                           type="button"
                           onClick={() => handleSidebarInsert(stk)}
-                          className="px-3 py-1 bg-[#5b7cff] text-white rounded-full text-xs font-medium">
+                          className="px-3 py-1 bg-gray-800 text-white rounded-full text-xs font-medium hover:bg-gray-700 transition-colors">
                           Insert
                         </button>
                         <button
@@ -931,12 +929,7 @@ export default function NewEntry() {
                             );
                             setSuccessMsg("Copied URL");
                           }}
-                          className="px-3 py-1 rounded-full text-xs font-medium border"
-                          style={{
-                            background: "var(--surface-2)",
-                            color: "var(--text)",
-                            borderColor: "var(--border)",
-                          }}>
+                          className="px-3 py-1 border text-xs font-medium rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                           Copy URL
                         </button>
                       </div>
