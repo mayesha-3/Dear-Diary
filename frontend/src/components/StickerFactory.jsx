@@ -318,28 +318,30 @@ export default function StickerFactory() {
   };
 
   return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Sticker Factory</h1>
+    <main className="p-6" style={{ color: 'var(--text)' }}>
+      <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-h)' }}>Sticker Factory</h1>
       <div className="flex flex-col lg:flex-row gap-6">
-        <aside className="w-full lg:w-64 bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
-          <h2 className="font-semibold text-lg mb-4">Tools</h2>
+        <aside className="w-full lg:w-64 rounded-xl p-4 shadow-sm" style={{ background: 'rgba(17, 28, 50, 0.9)', border: '1px solid var(--border)' }}>
+          <h2 className="font-semibold text-lg mb-4" style={{ color: 'var(--text-h)' }}>Tools</h2>
           <button
             type="button"
             onClick={() => setMode('brush')}
-            className={`w-full text-left px-4 py-3 mb-3 rounded-lg ${mode === 'brush' ? 'bg-blue-600 text-white' : 'bg-white text-slate-800 border border-slate-200'}`}
+            className={`w-full text-left px-4 py-3 mb-3 rounded-lg ${mode === 'brush' ? 'text-white' : ''}`}
+            style={{ background: mode === 'brush' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.06)', color: mode === 'brush' ? '#fff' : 'var(--text-muted)', border: '1px solid var(--border)' }}
           >
             Paintbrush
           </button>
           <button
             type="button"
             onClick={() => setMode('move')}
-            className={`w-full text-left px-4 py-3 mb-3 rounded-lg ${mode === 'move' ? 'bg-blue-600 text-white' : 'bg-white text-slate-800 border border-slate-200'}`}
+            className={`w-full text-left px-4 py-3 mb-3 rounded-lg ${mode === 'move' ? 'text-white' : ''}`}
+            style={{ background: mode === 'move' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.06)', color: mode === 'move' ? '#fff' : 'var(--text-muted)', border: '1px solid var(--border)' }}
           >
             Move images
           </button>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Brush color</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Brush color</label>
               <input
                 type="color"
                 value={brushColor}
@@ -348,7 +350,7 @@ export default function StickerFactory() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Brush size</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Brush size</label>
               <input
                 type="range"
                 min="2"
@@ -357,10 +359,10 @@ export default function StickerFactory() {
                 onChange={(e) => setBrushSize(Number(e.target.value))}
                 className="w-full"
               />
-              <p className="text-xs text-slate-500 mt-1">{brushSize}px</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{brushSize}px</p>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Add image</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Add image</label>
               <input
                 type="file"
                 accept="image/*"
@@ -372,14 +374,16 @@ export default function StickerFactory() {
               <button
                 type="button"
                 onClick={handleUndo}
-                className="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg"
+                className="flex-1 px-4 py-2 rounded-lg"
+                style={{ background: 'var(--accent)', color: '#fff' }}
               >
                 Undo
               </button>
               <button
                 type="button"
                 onClick={handleDeleteSelectedLayer}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg"
+                className="flex-1 px-4 py-2 rounded-lg"
+                style={{ background: '#ff6b6b', color: '#fff' }}
               >
                 Delete Layer
               </button>
@@ -388,7 +392,8 @@ export default function StickerFactory() {
               <button
                 type="button"
                 onClick={handleDownload}
-                className="w-full px-4 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800"
+                className="w-full px-4 py-3 rounded-lg"
+                style={{ background: 'var(--surface-3)', color: '#fff' }}
               >
                 Download PNG
               </button>
@@ -398,7 +403,8 @@ export default function StickerFactory() {
                 type="button"
                 disabled={saving}
                 onClick={handleSaveSticker}
-                className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+                className="w-full px-4 py-3 rounded-lg disabled:opacity-50"
+                style={{ background: '#29b27f', color: '#fff' }}
               >
                 {saving ? 'Saving...' : 'Save Sticker'}
               </button>
@@ -408,16 +414,17 @@ export default function StickerFactory() {
 
         <section className="flex-1">
           <div className="mx-auto mb-4" style={{ maxWidth: CANVAS_SIZE + 32 }}>
-            <div className="grid place-items-center bg-slate-100 p-4 rounded-3xl border border-slate-200 shadow-sm">
+            <div className="grid place-items-center p-4 rounded-3xl shadow-sm" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)' }}>
               <div className="relative">
-                <div className="absolute -left-20 top-10 w-16 h-16 rounded-full bg-blue-200 grid place-items-center text-blue-800 text-sm shadow-lg">
+                <div className="absolute -left-20 top-10 w-16 h-16 rounded-full grid place-items-center text-sm shadow-lg" style={{ background: 'rgba(111,141,255,0.2)', color: 'var(--accent-2)' }}>
                   Brush
                 </div>
                 <canvas
                   ref={canvasRef}
                   width={CANVAS_SIZE}
                   height={CANVAS_SIZE}
-                  className="border border-slate-300 rounded-xl bg-white"
+                  className="rounded-xl"
+                  style={{ border: '1px solid var(--border)', background: 'rgba(255,255,255,0.95)' }}
                   onMouseDown={handleCanvasPointerDown}
                   onMouseMove={handleCanvasPointerMove}
                   onMouseUp={handleCanvasPointerUp}
@@ -427,38 +434,38 @@ export default function StickerFactory() {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+          <div className="rounded-3xl p-5 shadow-sm" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)' }}>
             {selectedLayerId && (
               <div className="mb-4 p-3 border border-slate-100 rounded">
-                <h3 className="font-medium mb-2">Selected Layer Controls</h3>
+                <h3 className="font-medium mb-2" style={{ color: 'var(--text-h)' }}>Selected Layer Controls</h3>
                 <div className="grid grid-cols-2 gap-3 items-center">
-                  <label className="text-sm">Width</label>
+                  <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Width</label>
                   <input type="range" min="20" max="560" value={(layers.find(l=>l.id===selectedLayerId)?.width)||120} onChange={(e)=>handleUpdateSelectedLayer({width: Number(e.target.value)})} />
-                  <label className="text-sm">Height</label>
+                  <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Height</label>
                   <input type="range" min="20" max="560" value={(layers.find(l=>l.id===selectedLayerId)?.height)||120} onChange={(e)=>handleUpdateSelectedLayer({height: Number(e.target.value)})} />
-                  <label className="text-sm">Rotation</label>
+                  <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Rotation</label>
                   <input type="range" min="-180" max="180" value={(layers.find(l=>l.id===selectedLayerId)?.rotation)||0} onChange={(e)=>handleUpdateSelectedLayer({rotation: Number(e.target.value)})} />
                 </div>
               </div>
             )}
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="font-semibold text-xl">Past Stickers</h2>
-                <p className="text-sm text-slate-500">Your saved sticker library appears here.</p>
+                <h2 className="font-semibold text-xl" style={{ color: 'var(--text-h)' }}>Past Stickers</h2>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Your saved sticker library appears here.</p>
               </div>
               {statusMessage && <span className="text-sm text-slate-600">{statusMessage}</span>}
             </div>
             {loadingStickers ? (
-              <div className="p-6 text-center text-slate-500">Loading stickers...</div>
+              <div className="p-6 text-center" style={{ color: 'var(--text-muted)' }}>Loading stickers...</div>
             ) : pastStickers.length === 0 ? (
-              <div className="p-6 text-center text-slate-500">No saved stickers yet.</div>
+              <div className="p-6 text-center" style={{ color: 'var(--text-muted)' }}>No saved stickers yet.</div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {pastStickers.map((sticker) => (
-                  <div key={sticker._id} className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
+                  <div key={sticker._id} className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--border)', background: 'rgba(255,255,255,0.04)' }}>
                     <img onClick={() => downloadStickerImage(sticker)} role="button" style={{cursor:'pointer'}} src={resolveAssetUrl(sticker.imageUrl)} alt={sticker.label || 'Saved sticker'} className="w-full h-40 object-cover" />
                     <div className="p-3 space-y-2">
-                      <p className="text-sm font-medium text-slate-800">{sticker.label || 'Sticker'}</p>
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-h)' }}>{sticker.label || 'Sticker'}</p>
                                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -476,14 +483,16 @@ export default function StickerFactory() {
                                 setStatusMessage('Failed to copy image.');
                               });
                           }}
-                          className="flex-1 px-3 py-2 bg-slate-900 text-white rounded-lg text-sm"
+                          className="flex-1 px-3 py-2 rounded-lg text-sm"
+                          style={{ background: 'var(--surface-3)', color: '#fff' }}
                         >
                           Copy Image
                         </button>
                         <button
                           type="button"
                           onClick={() => deletePastSticker(sticker._id)}
-                          className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg text-sm"
+                          className="flex-1 px-3 py-2 rounded-lg text-sm"
+                          style={{ background: '#ff6b6b', color: '#fff' }}
                         >
                           Delete
                         </button>

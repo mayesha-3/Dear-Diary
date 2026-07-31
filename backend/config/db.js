@@ -11,8 +11,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1']);
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-  console.error('❌ MONGO_URI is not defined in .env — please add it.');
-  process.exit(1);
+  console.warn('⚠️  MONGO_URI is not defined in .env — continuing without MongoDB for now.');
 }
 
 let isConnected = false;
@@ -20,6 +19,11 @@ let isConnected = false;
 export async function connectDB() {
   if (isConnected) {
     console.log('⚡ MongoDB already connected.');
+    return;
+  }
+
+  if (!MONGO_URI) {
+    console.warn('⚠️  Skipping MongoDB connection because MONGO_URI is missing.');
     return;
   }
 
@@ -40,8 +44,8 @@ export async function connectDB() {
       console.error('❌ MongoDB error:', err);
     });
   } catch (err) {
-    console.error('❌ MongoDB connection failed:', err.message);
-    process.exit(1);
+    console.error('⚠️  MongoDB connection failed:', err.message);
+    console.warn('⚠️  Continuing with the server running; database-backed routes may fail until MongoDB is reachable.');
   }
 }
 

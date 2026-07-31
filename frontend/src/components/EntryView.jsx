@@ -58,17 +58,17 @@ export default function EntryView() {
 
   if (loading) {
     return (
-      <main className="container mx-auto p-6">
-        <p>Loading entry…</p>
+      <main className="container mx-auto p-6" style={{ color: 'var(--text)' }}>
+        <p style={{ color: 'var(--text-muted)' }}>Loading entry…</p>
       </main>
     );
   }
 
   if (errorMsg || !entry) {
     return (
-      <main className="container mx-auto p-6">
+      <main className="container mx-auto p-6" style={{ color: 'var(--text)' }}>
         <p role="alert" className="text-red-600">{errorMsg || 'Entry not found.'}</p>
-        <Link to="/entries" className="text-blue-600 hover:underline mt-4 block">
+        <Link to="/entries" className="mt-4 block" style={{ color: 'var(--accent-2)' }}>
           Back to Past Entries
         </Link>
       </main>
@@ -76,10 +76,10 @@ export default function EntryView() {
   }
 
   return (
-    <main className="container mx-auto p-6">
+    <main className="container mx-auto p-6" style={{ color: 'var(--text)' }}>
       <section>
         <nav className="mb-6">
-          <Link to="/entries" className="text-blue-600 hover:underline">
+          <Link to="/entries" style={{ color: 'var(--accent-2)' }} className="hover:underline">
             ← Back to Past Entries
           </Link>
         </nav>
@@ -100,13 +100,13 @@ export default function EntryView() {
 
         <header className="mb-6">
           <h1 className="text-4xl font-bold mb-2">{entry.title}</h1>
-          <p className="text-gray-600">
+          <p style={{ color: 'var(--text-muted)' }}>
             <time dateTime={entry.entryDate}>{formatDate(entry.entryDate)}</time>
           </p>
           {(entry.mood || entry.activity) && (
-            <div className="mt-3 flex flex-wrap gap-3 text-sm text-gray-700">
-              {entry.mood && <span className="px-3 py-1 bg-yellow-100 rounded-full">Mood: {entry.mood}</span>}
-              {entry.activity && <span className="px-3 py-1 bg-slate-100 rounded-full">Activity: {entry.activity}</span>}
+            <div className="mt-3 flex flex-wrap gap-3 text-sm" style={{ color: 'var(--text-muted)' }}>
+              {entry.mood && <span className="px-3 py-1 rounded-full" style={{ background: 'rgba(111,141,255,0.18)', color: 'var(--text)' }}>Mood: {entry.mood}</span>}
+              {entry.activity && <span className="px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--text)' }}>Activity: {entry.activity}</span>}
             </div>
           )}
         </header>
@@ -115,7 +115,8 @@ export default function EntryView() {
         {/* Rich text content                                       */}
         {/* ------------------------------------------------------ */}
         <article
-          className="prose prose-lg max-w-none mb-6 text-gray-800"
+          className="prose prose-lg max-w-none mb-6"
+          style={{ color: 'var(--text)' }}
           dangerouslySetInnerHTML={{ __html: entry.content }}
         />
 
@@ -125,7 +126,7 @@ export default function EntryView() {
         {entry.stickers && entry.stickers.length > 0 && (
           <section className="mt-8">
             <h2 className="text-2xl font-semibold mb-4">Stickers</h2>
-            <div className="relative w-full bg-gray-50 border-2 border-gray-300 rounded p-4" style={{ minHeight: '300px' }}>
+            <div className="relative w-full rounded p-4" style={{ minHeight: '300px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}>
               {entry.stickers.map((sticker) => (
                 <div
                   key={sticker.stickerId}

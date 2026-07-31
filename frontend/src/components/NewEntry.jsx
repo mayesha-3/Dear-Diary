@@ -391,7 +391,7 @@ export default function NewEntry() {
   const [messageToSelf, setMessageToSelf] = useState("");
 
   return (
-    <main className="container mx-auto mt-8 p-6 bg-white border-[3px] border-black rounded-[40px] shadow-2xl relative overflow-hidden">
+    <main className="container mx-auto mt-8 p-6 rounded-[40px] shadow-2xl relative overflow-hidden" style={{ background: 'rgba(17, 28, 50, 0.96)', border: '1px solid var(--border)' }}>
       {/* Scrapbook Header */}
 <div className="relative text-center py-8">
 
@@ -410,30 +410,32 @@ export default function NewEntry() {
       <form onSubmit={handleSave} className="space-y-6">
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium mb-2">Title</label>
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border rounded"
             placeholder="Entry title"
+            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text)', borderColor: 'var(--border)' }}
           />
         </div>
 
         {/* Entry Date */}
         <div>
-          <label className="block text-sm font-medium mb-2">Date</label>
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Date</label>
           <input
             type="date"
             value={entryDate}
             onChange={(e) => setEntryDate(e.target.value)}
             className="w-full px-4 py-2 border rounded"
+            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text)', borderColor: 'var(--border)' }}
           />
         </div>
 
         {/* NEW: PDF Document Scanning Component */}
-        <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
-          <label className="block text-sm font-semibold text-blue-900 mb-2">
+        <div className="p-4 rounded-md" style={{ background: 'rgba(111,141,255,0.14)', border: '1px solid rgba(111,141,255,0.28)' }}>
+          <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-h)' }}>
             ✨ Autofill via PDF Scan
           </label>
           <input
@@ -441,10 +443,11 @@ export default function NewEntry() {
             accept="application/pdf"
             onChange={handlePdfScan}
             disabled={pdfScanning}
-            className="block text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-white hover:file:bg-blue-800 disabled:opacity-50"
+            className="block text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#3557c7] file:text-white hover:file:bg-[#2947a8] disabled:opacity-50"
+            style={{ color: 'var(--text-muted)' }}
           />
           {pdfScanning && (
-            <p className="text-xs font-medium text-blue-700 mt-2 animate-pulse">
+            <p className="text-xs font-medium mt-2 animate-pulse" style={{ color: 'var(--accent-2)' }}>
               Running Python AI pipeline... reading PDF data...
             </p>
           )}
@@ -452,7 +455,7 @@ export default function NewEntry() {
 
         {/* Content Box (contenteditable for inline images) */}
         <div>
-          <label className="block text-sm font-medium mb-2">Content</label>
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Content</label>
           <div className="flex items-start gap-4">
             <div className="flex-1">
               <div className="relative w-full">
@@ -473,31 +476,31 @@ export default function NewEntry() {
                   style={{direction:'ltr', unicodeBidi:'plaintext'}}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
                 Paste images (Ctrl/Cmd+V) to insert stickers directly.
               </p>
             </div>
             <div className="w-48">
               <div className="mb-3">
-                <label className="block text-sm font-medium">Stickers</label>
-                <button type="button" onClick={() => { setShowStickerPanel((s)=>!s); loadPastStickers(); }} className="mt-2 w-full px-3 py-2 bg-slate-100 rounded">Open Stickers</button>
+                <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Stickers</label>
+                <button type="button" onClick={() => { setShowStickerPanel((s)=>!s); loadPastStickers(); }} className="mt-2 w-full px-3 py-2 rounded" style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--text)' }}>Open Stickers</button>
               </div>
               <div className="mb-3">
-                <label className="block text-sm font-medium">Insert Mode</label>
+                <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Insert Mode</label>
                 <div className="mt-2 space-x-2">
-                  <label className="inline-flex items-center"><input type="radio" name="insertMode" checked={insertMode==='inline'} onChange={()=>setInsertMode('inline')} /> <span className="ml-2">Inline</span></label>
-                  <label className="inline-flex items-center ml-3"><input type="radio" name="insertMode" checked={insertMode==='behind'} onChange={()=>setInsertMode('behind')} /> <span className="ml-2">Behind text</span></label>
+                  <label className="inline-flex items-center" style={{ color: 'var(--text-muted)' }}><input type="radio" name="insertMode" checked={insertMode==='inline'} onChange={()=>setInsertMode('inline')} /> <span className="ml-2">Inline</span></label>
+                  <label className="inline-flex items-center ml-3" style={{ color: 'var(--text-muted)' }}><input type="radio" name="insertMode" checked={insertMode==='behind'} onChange={()=>setInsertMode('behind')} /> <span className="ml-2">Behind text</span></label>
                 </div>
               </div>
               {selectedInlineImage && (
-                <div className="p-2 border rounded">
-                  <p className="text-sm font-medium">Selected Image Controls</p>
-                  <label className="text-xs">Width</label>
+                <div className="p-2 border rounded" style={{ borderColor: 'var(--border)', background: 'rgba(255,255,255,0.05)' }}>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>Selected Image Controls</p>
+                  <label className="text-xs" style={{ color: 'var(--text-muted)' }}>Width</label>
                   <input type="range" min="20" max="800" onChange={(e)=>{
                     const el = contentRef.current.querySelector(`img[data-sticker-id='${selectedInlineImage}']`);
                     if (el){ el.style.width = `${e.target.value}px`; setContent(contentRef.current.innerHTML); }
                   }} />
-                  <div className="text-xs text-slate-500 mt-2">Click an inline image to select it and adjust size.</div>
+                  <div className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>Click an inline image to select it and adjust size.</div>
                 </div>
               )}
             </div>
@@ -515,7 +518,7 @@ export default function NewEntry() {
     <div className="absolute -top-2 right-2 text-3xl">✂️</div>
     <div className="absolute bottom-2 right-2 text-3xl">🖇️</div>
 
-    <div className="border-2 border-gray-300 rounded-3xl p-4 bg-white">
+    <div className="rounded-3xl p-4" style={{ border: '1px solid var(--border)', background: 'rgba(255,255,255,0.04)' }}>
 
       {picOfDay.imageUrl ? (
         <img
@@ -524,7 +527,7 @@ export default function NewEntry() {
           className="w-full h-72 object-cover rounded-xl"
         />
       ) : (
-        <div className="h-72 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl">
+        <div className="h-72 flex items-center justify-center border-2 border-dashed rounded-xl" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
           Insert Image
         </div>
       )}
@@ -545,7 +548,7 @@ export default function NewEntry() {
   <div className="space-y-5">
     <div className="border-2 border-gray-300 rounded-3xl p-4">
 
-      <h3 className="text-xl font-semibold mb-3">
+      <h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-h)' }}>
         How do I feel today?
       </h3>
 
@@ -554,25 +557,28 @@ export default function NewEntry() {
         <button
           type="button"
           onClick={() => setMood("Good")}
-          className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
-            mood === "Good" ? "bg-black text-white" : ""
+          className={`px-4 py-2 rounded-full border-2 ${
+            mood === "Good" ? "text-white" : ""
           }`}
+          style={{ borderColor: 'var(--border)', background: mood === 'Good' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.04)', color: mood === 'Good' ? '#fff' : 'var(--text-muted)' }}
         >          😊 Good        </button>
 
         <button
           type="button"
           onClick={() => setMood("Okay")}
-          className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
-            mood === "Okay" ? "bg-black text-white" : ""
+          className={`px-4 py-2 rounded-full border-2 ${
+            mood === "Okay" ? "text-white" : ""
           }`}
+          style={{ borderColor: 'var(--border)', background: mood === 'Okay' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.04)', color: mood === 'Okay' ? '#fff' : 'var(--text-muted)' }}
         >          🙂 Okay        </button>
 
         <button
           type="button"
           onClick={() => setMood("Bad")}
-          className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
-            mood === "Bad" ? "bg-black text-white" : ""
+          className={`px-4 py-2 rounded-full border-2 ${
+            mood === "Bad" ? "text-white" : ""
           }`}
+          style={{ borderColor: 'var(--border)', background: mood === 'Bad' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.04)', color: mood === 'Bad' ? '#fff' : 'var(--text-muted)' }}
         >          😔 Bad        </button>
 
       </div>
@@ -581,7 +587,7 @@ export default function NewEntry() {
 
     <div className="border-2 border-gray-300 rounded-3xl p-4">
 
-      <h3 className="font-semibold mb-2">
+      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-h)' }}>
         🎀 Activity of the Day
       </h3>
 
@@ -589,7 +595,8 @@ export default function NewEntry() {
         value={activity}
         onChange={(e) => setActivity(e.target.value)}
         rows="4"
-        className="w-full outline-none"
+        className="w-full outline-none rounded"
+        style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text)', border: '1px solid var(--border)', padding: '0.75rem' }}
       />
 
     </div>
@@ -600,16 +607,17 @@ export default function NewEntry() {
 
         {/* Stickers Section */}
         <div>
-          <label className="block text-sm font-medium mb-2">Add Stickers</label>
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Add Stickers</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleStickerUpload}
             disabled={stickerUploading}
             className="px-4 py-2 border rounded"
+            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text)', borderColor: 'var(--border)' }}
           />
           {stickerUploading && (
-            <p className="text-sm text-gray-500 mt-2">Uploading...</p>
+            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>Uploading...</p>
           )}
         </div>
 
@@ -622,7 +630,8 @@ export default function NewEntry() {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              className="relative w-full bg-gray-50 border-2 border-gray-300 rounded p-4"
+              className="relative w-full rounded p-4"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', minHeight: '300px' }}
               style={{ minHeight: "300px" }}>
               {stickers.map((sticker) => (
                 <div
@@ -674,17 +683,18 @@ export default function NewEntry() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full px-6 py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-700 disabled:bg-gray-400">
+          className="w-full px-6 py-3 rounded font-semibold"
+          style={{ background: 'var(--accent-strong)', color: '#f9fbff' }}>
           {saving ? "Saving..." : "Save Entry"}
         </button>
         {showStickerPanel && (
-          <div className="fixed right-6 top-20 w-80 max-h-[70vh] overflow-auto bg-white border rounded-lg p-4 shadow-lg z-50">
+          <div className="fixed right-6 top-20 w-80 max-h-[70vh] overflow-auto rounded-lg p-4 shadow-lg z-50" style={{ background: 'rgba(17, 28, 50, 0.98)', border: '1px solid var(--border)' }}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">Your Stickers</h3>
-              <button type="button" onClick={()=>setShowStickerPanel(false)} className="text-sm text-slate-500">Close</button>
+              <button type="button" onClick={()=>setShowStickerPanel(false)} className="text-sm" style={{ color: 'var(--text-muted)' }}>Close</button>
             </div>
             {pastStickers.length===0 ? (
-              <div className="text-sm text-slate-500">No saved stickers yet.</div>
+              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>No saved stickers yet.</div>
             ) : (
               <div className="grid gap-3">
                 {pastStickers.map((stk)=> (

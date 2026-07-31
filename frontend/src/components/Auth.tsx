@@ -82,18 +82,18 @@ export default function Auth() {
       className="min-h-screen flex items-center justify-center p-4"
       style={{
         background:
-          "repeating-linear-gradient(to bottom, #f7f3e9, #f7f3e9 28px, #e3dac9 29px)",
+          "linear-gradient(135deg, #07111f 0%, #0d1830 45%, #111c32 100%)",
         fontFamily: "var(--sans)",
       }}>
-      <div className="relative w-full max-w-md bg-[#fffdf8] rounded-xl shadow-2xl overflow-hidden border-2 border-[#d9cbb3] p-8 md:p-10">
+      <div className="relative w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-[var(--border)] p-8 md:p-10" style={{ background: 'rgba(17, 28, 50, 0.96)' }}>
         {/* Title */}
         <div className="text-center mb-8 mt-4">
           <h1
-            className="text-4xl md:text-5xl text-[#2b1d0e] mb-2 font-normal"
-            style={{ fontFamily: "var(--heading)" }}>
+            className="text-4xl md:text-5xl mb-2 font-normal"
+            style={{ fontFamily: "var(--heading)", color: "var(--text-h)" }}>
             Dear Diary
           </h1>
-          <p className="text-sm text-[#8c7355] italic">
+          <p className="text-sm italic" style={{ color: "var(--text-muted)" }}>
             {isLogin
               ? "Open the pages of your memories..."
               : "Start your personal story today..."}
@@ -111,7 +111,7 @@ export default function Auth() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && (
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[#8c7355] mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>
                 Your Nickname
               </label>
               <input
@@ -120,7 +120,8 @@ export default function Auth() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Mayesha"
-                className="w-full px-3 py-2 border-b-2 border-[#d9cbb3] focus:border-[#c97b63] outline-none"
+                className="w-full px-3 py-2 border-b-2 outline-none"
+                style={{ borderColor: "var(--border)", color: "var(--text)" }}
               />
             </div>
           )}
@@ -156,7 +157,8 @@ export default function Auth() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-[#c97b63] text-white font-bold rounded-lg mt-4">
+            className="w-full py-3 font-bold rounded-lg mt-4"
+            style={{ background: "var(--accent-strong)", color: "#f9fbff" }}>
             {loading
               ? "Opening..."
               : isLogin
@@ -169,13 +171,14 @@ export default function Auth() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-3 bg-[#f47a42] text-white font-bold rounded-lg shadow-md hover:bg-[#e8a035] mt-4">
+          className="w-full py-3 font-bold rounded-lg shadow-md mt-4"
+          style={{ background: "var(--accent)", color: "#f9fbff" }}>
           {loading ? "Connecting..." : "Sign in with Google"}
         </button>
 
         {/* Toggle Mode */}
-        <div className="text-center mt-8 pt-6 border-t border-dashed border-[#e3dac9]">
-          <p className="text-sm text-[#8c7355]">
+        <div className="text-center mt-8 pt-6 border-t border-dashed" style={{ borderColor: "var(--border)" }}>
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             {isLogin ? "Don't have a diary account?" : "Already have a diary?"}
           </p>
           <button
@@ -183,7 +186,8 @@ export default function Auth() {
               setIsLogin(!isLogin);
               setError("");
             }}
-            className="mt-2 text-[#c97b63] font-bold hover:underline">
+            className="mt-2 font-bold hover:underline"
+            style={{ color: "var(--accent-2)" }}>
             {isLogin ? "Sign Up for Free" : "Sign In"}
           </button>
         </div>
