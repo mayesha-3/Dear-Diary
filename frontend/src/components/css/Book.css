@@ -1,29 +1,123 @@
-/* 3D Journal CSS Stylesheet */
 
-.journal-container {
+.cute-cover {
+  background: #d0d268; /* Soft pastel cream/blush */
+  border: 3px solid #e17ca8;
+  color: #5c3c67;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  height: 80vh;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 0 0 6px #fff,
+    0 10px 25px rgba(206, 39, 125, 0.4);
+}
+
+/* Inner White Dashed Border */
+.cover-border-inner {
+  position: absolute;
+  inset: 16px;
+  border: 2px dashed #e8b2cb;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+/* Corner Sticker Accents */
+.cute-sticker {
+  position: absolute;
+  font-size: 1.4rem;
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+}
+
+.cute-sticker.top-left { top: 20px; left: 20px; transform: rotate(-10deg); }
+.cute-sticker.top-right { top: 20px; right: 20px; transform: rotate(12deg); }
+.cute-sticker.bottom-left { bottom: 20px; left: 20px; transform: rotate(8deg); }
+.cute-sticker.bottom-right { bottom: 20px; right: 20px; transform: rotate(-15deg); }
+
+.cover-title-group {
+  margin-top: 18%;
+  text-align: center;
+  z-index: 2;
+}
+
+.cute-crest {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  letter-spacing: 4px;
+}
+
+.cover-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  font-weight: 700;
+  color: #6d4677;
+  text-transform: lowercase;
+}
+
+.cute-divider {
+  width: 50px;
+  height: 2px;
+  background: #e8b2cb;
+  border-radius: 2px;
+  margin: 10px auto;
+}
+
+.cover-subtitle {
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  color: #92639e;
+}
+
+.cover-badge {
+  width: 60px;
+  height: 60px;
+  background: #ffffff;
+  border: 2px solid #f3d1e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 10px rgba(223, 182, 203, 0.3);
+  margin-bottom: 8%;
+}
+
+.cover-author {
+  z-index: 2;
+  text-align: center;
+}
+.journal-container {
   position: relative;
   width: 100%;
-  max-width: 1200px;
+  max-width: 900px;
+  height: 520px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 2000px;
+  user-select: none;
 }
 
 /* Hover sensors overlayed on the sides of the book */
-.hover-sensor-left, .hover-sensor-right {
+.hover-sensor-left,
+.hover-sensor-right {
   position: absolute;
   top: 0;
-  width: 18%;
-  height: 100%;
+  bottom: 0;
+  width: 20%;
   z-index: 100;
-  cursor: w-resize;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
 }
 
 .hover-sensor-left {
   left: 0;
+  cursor: w-resize;
 }
 
 .hover-sensor-right {
@@ -31,197 +125,241 @@
   cursor: e-resize;
 }
 
-/* Book 3D environment */
+/* Book 3D Environment */
 .book-wrapper {
-  perspective: 2000px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  width: 380px;
+  height: 480px;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .book-3d {
   position: relative;
-  width: 32vw;
-  min-width: 380px;
-  height: 65vh;
-  min-height: 520px;
+  width: 100%;
+  height: 100%;
   transform-style: preserve-3d;
-  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: rotateX(12deg) rotateY(0deg) rotateZ(-2deg);
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotateX(8deg) rotateY(0deg) rotateZ(0deg);
 }
 
-/* When the book is open, we can apply a slight overall rotation shift for better 3D depth */
+/* When open, shift right page to center the spread */
 .book-3d.open {
-  transform: rotateX(12deg) rotateY(0deg) rotateZ(0deg) translateX(-16vw);
+  transform: rotateX(8deg) rotateY(0deg) rotateZ(0deg) translateX(50%);
 }
 
-/* Page Card styling */
+/* ==========================================
+   PAGE CARDS & FLIP ANIMATION
+   ========================================== */
+
 .page-card {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   transform-origin: left center;
   transform-style: preserve-3d;
-  transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  border-radius: 8px 16px 16px 8px;
+  transition: transform 0.85s cubic-bezier(0.645, 0.045, 0.355, 1);
+  border-radius: 4px 16px 16px 4px;
 }
 
 .page-card.flipped-card {
   transform: rotateY(-180deg);
 }
 
-/* Front & Back faces */
+/* Front & Back Faces */
 .page-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 8px 16px 16px 8px;
-  overflow: hidden;
-  box-shadow: inset -3px 0 10px rgba(0,0,0,0.05);
-}
-
-.page-face.face-back {
-  transform: rotateY(180deg);
-  border-radius: 16px 8px 8px 16px;
-  box-shadow: inset 3px 0 10px rgba(0,0,0,0.05);
-}
-
-/* Page shading overlay */
-.page-shading {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  backface-visibility: hidden;
+  border-radius: 4px 16px 16px 4px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.3);
+}
+
+.page-face.face-back {
+  transform: rotateY(180deg);
+  border-radius: 16px 4px 4px 16px;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.3);
+}
+
+/* Spine Fold & Edge Shading Overlays */
+.page-shading {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent 15%, transparent 85%, rgba(0, 0, 0, 0.08));
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.03) 8%,
+    transparent 20%,
+    transparent 88%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
   z-index: 10;
 }
 
 .face-back .page-shading {
-  background: linear-gradient(to left, rgba(0, 0, 0, 0.1), transparent 15%, transparent 85%, rgba(0, 0, 0, 0.08));
+  background: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.03) 8%,
+    transparent 20%,
+    transparent 88%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
 }
 
-/* --- Cover styling --- */
+/* ==========================================
+   COVER STYLING
+   ========================================== */
+
 .leather-cover {
-  background: radial-gradient(circle at 30% 30%, #7e3838, #663e21);
-  border: 8px double #d4af37;
-  color: #d4af37;
+  background: 
+    radial-gradient(circle at 30% 30%, #6e3326 0%, #421e16 70%, #28110b 100%);
+  border: 2px solid #5c2b20;
+  color: #ffe494;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 30px;
+  padding: 32px 24px;
   box-sizing: border-box;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    inset 0 0 35px rgba(0, 0, 0, 0.75),
+    inset 0 0 4px 2px rgba(212, 175, 55, 0.3),
+    8px 16px 30px rgba(0, 0, 0, 0.45);
 }
 
-/* Gold corner ornaments on cover */
+/* Inner Gold Border */
+.cover-border-inner {
+  position: absolute;
+  inset: 14px;
+  border: 1.5px solid rgba(255, 228, 148, 0.4);
+  border-radius: 4px 12px 12px 4px;
+  pointer-events: none;
+}
+
+/* Gold Corner Ornaments */
 .cover-corner {
   position: absolute;
-  width: 35px;
-  height: 35px;
-  border: 3px solid #d4af37;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e06417;
   opacity: 0.85;
+  pointer-events: none;
 }
-.corner-tl { top: 12px; left: 12px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
-.corner-tr { top: 12px; right: 12px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
-.corner-bl { bottom: 12px; left: 12px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
-.corner-br { bottom: 12px; right: 12px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
+
+.corner-tl { top: 18px; left: 18px; border-right: none; border-bottom: none; border-radius: 2px 0 0 0; }
+.corner-tr { top: 18px; right: 18px; border-left: none; border-bottom: none; border-radius: 0 2px 0 0; }
+.corner-bl { bottom: 18px; left: 18px; border-right: none; border-top: none; border-radius: 0 0 0 2px; }
+.corner-br { bottom: 18px; right: 18px; border-left: none; border-top: none; border-radius: 0 0 2px 0; }
 
 .cover-title-group {
-  margin-top: 25%;
+  margin-top: 15%;
   text-align: center;
+  z-index: 2;
 }
 
 .cover-title {
   font-family: 'Cinzel', serif;
-  font-size: 2.8rem;
-  letter-spacing: 2px;
-  margin-bottom: 5px;
+  font-size: 2.4rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
   font-weight: 700;
-  background: linear-gradient(to bottom, #ffe494, #d4af37);
+  background: linear-gradient(180deg, #fff2c4 0%, #d4af37 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
 }
 
 .cover-subtitle {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: #ffe494;
-  opacity: 0.9;
+  opacity: 0.85;
+  letter-spacing: 0.08em;
 }
 
 .cover-emboss {
-  width: 80px;
-  height: 80px;
-  border: 2px solid #d4af37;
+  width: 70px;
+  height: 70px;
+  border: 1.5px solid rgba(212, 175, 55, 0.6);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20%;
-  font-size: 2rem;
+  margin-bottom: 12%;
+  font-size: 1.8rem;
+  color: #ffe494;
   opacity: 0.8;
+  background: rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* --- Lined notebook page styling --- */
+/* ==========================================
+   NOTEBOOK PAGES & RULING
+   ========================================== */
+
 .notebook-page {
-  background: #fdfaf2;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #fdfaf2;
   background-image: 
-    linear-gradient(90deg, transparent 45px, #f29c9c 45px, #f29c9c 47px, transparent 47px),
-    repeating-linear-gradient(#fdfaf2, #fdfaf2 25px, #cbe3db 26px);
-  padding: 40px 25px 25px 55px; /* extra left padding for rings space */
+    linear-gradient(90deg, transparent 42px, #f29c9c 42px, #f29c9c 44px, transparent 44px),
+    repeating-linear-gradient(#fdfaf2, #fdfaf2 27px, #cbe3db 28px);
+  padding: 36px 24px 24px 50px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  box-shadow: inset 0 0 25px rgba(184, 160, 128, 0.18);
 }
 
 .face-back .notebook-page {
-  padding: 40px 55px 25px 25px; /* flip padding for left side */
+  padding: 36px 50px 24px 24px;
   background-image: 
-    linear-gradient(270deg, transparent 45px, #f29c9c 45px, #f29c9c 47px, transparent 47px),
-    repeating-linear-gradient(#fdfaf2, #fdfaf2 25px, #cbe3db 26px);
+    linear-gradient(270deg, transparent 42px, #f29c9c 42px, #f29c9c 44px, transparent 44px),
+    repeating-linear-gradient(#fdfaf2, #fdfaf2 27px, #cbe3db 28px);
 }
 
-/* Spiral rings in the center fold */
+/* Spiral Ring Center Bindings */
 .spine-spiral-rings {
   position: absolute;
-  top: 5%;
+  top: 4%;
   left: -12px;
   width: 24px;
-  height: 90%;
+  height: 92%;
   z-index: 50;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   pointer-events: none;
 }
 
-/* Each metal ring hook */
 .spiral-ring {
-  width: 28px;
-  height: 10px;
-  background: linear-gradient(to bottom, #dcdcdc, #a9a9a9, #808080);
-  border-radius: 5px;
-  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-  transform: rotate(-5deg);
+  width: 26px;
+  height: 9px;
+  background: linear-gradient(180deg, #e8e8e8 0%, #9e9e9e 50%, #5a5a5a 100%);
+  border-radius: 6px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
+  transform: rotate(-3deg);
 }
 
-/* --- Cute page content styles --- */
+/* ==========================================
+   PAGE CONTENT STYLING
+   ========================================== */
+
 .diary-date {
   font-family: 'Playfair Display', serif;
-  font-size: 1.05rem;
-  font-weight: bold;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #7b6248;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   border-bottom: 1px dashed #dcd3b8;
   padding-bottom: 4px;
   text-align: right;
@@ -229,103 +367,112 @@
 
 .diary-text {
   font-family: 'Caveat', cursive;
-  font-size: 1.45rem;
-  line-height: 1.8rem;
+  font-size: 1.35rem;
+  line-height: 28px;
   color: #3b2a1a;
   flex-grow: 1;
 }
 
-/* Doodles / stickers / tape overlays */
+/* Decorative Overlays: Washi Tape, Stickers, Polaroids */
 .washi-tape {
   position: absolute;
-  background: rgba(224, 187, 228, 0.65);
-  border-left: 2px dashed rgba(255,255,255,0.4);
-  border-right: 2px dashed rgba(255,255,255,0.4);
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-  padding: 3px 15px;
+  background: rgba(224, 187, 228, 0.75);
+  border-left: 2px dashed rgba(255, 255, 255, 0.6);
+  border-right: 2px dashed rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  padding: 2px 14px;
   font-family: 'Shadows Into Light', cursive;
   font-size: 0.85rem;
-  color: #4a4a4a;
+  color: #3d3d3d;
+  z-index: 12;
 }
 
 .sticker-cute {
   position: absolute;
-  filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.15));
-  transition: transform 0.3s ease;
+  filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.15));
+  transition: transform 0.25 ease;
   user-select: none;
 }
 
 .sticker-cute:hover {
-  transform: scale(1.1) rotate(5deg) !important;
+  transform: scale(1.15) rotate(6deg) !important;
 }
 
 .polaroid-frame {
   position: absolute;
-  background: white;
-  padding: 8px 8px 24px 8px;
-  box-shadow: 2px 5px 12px rgba(0,0,0,0.18);
-  border: 1px solid #eaeaea;
+  background: #ffffff;
+  padding: 6px 6px 18px 6px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  border: 1px solid #eee;
   display: inline-block;
   z-index: 5;
+  transition: transform 0.3s ease;
+}
+
+.polaroid-frame:hover {
+  transform: scale(1.03) rotate(0deg) !important;
+  z-index: 15;
 }
 
 .polaroid-frame img {
   width: 100%;
   height: 100%;
-  object-cover: cover;
-  border: 1px solid #ddd;
+  object-fit: cover;
+  border: 1px solid #f0f0f0;
 }
 
 .polaroid-caption {
   font-family: 'Caveat', cursive;
   text-align: center;
-  font-size: 1.1rem;
-  margin-top: 6px;
+  font-size: 1rem;
+  margin-top: 4px;
   color: #555;
 }
 
-/* Cute list items with handwriting checkmarks */
+/* Checklists */
 .cute-todo-list {
   list-style: none;
-  padding-left: 5px;
-  margin-top: 10px;
+  padding-left: 0;
+  margin-top: 8px;
 }
 
 .cute-todo-list li {
   position: relative;
-  padding-left: 28px;
-  margin-bottom: 8px;
+  padding-left: 26px;
+  margin-bottom: 6px;
+  line-height: 28px;
 }
 
 .cute-todo-list li::before {
   content: '✔';
   position: absolute;
-  left: 3px;
-  top: -2px;
+  left: 2px;
+  top: -1px;
   font-family: 'Caveat', cursive;
   color: #c97b63;
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
 }
 
-/* Bookmark ribbon */
+/* Ribbon Bookmark */
 .ribbon-bookmark {
   position: absolute;
   top: -10px;
-  left: 8%;
-  width: 16px;
-  height: 120%;
-  background: linear-gradient(to right, #ba4b42, #8b231c);
+  left: 5%;
+  width: 14px;
+  height: 110%;
+  background: linear-gradient(180deg, #ef7272e1 0%, #f46969 50%, #ad3434 100%);
   z-index: 45;
-  box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
-  border-radius: 0 0 3px 3px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.25);
+  border-radius: 0 0 2px 2px;
   pointer-events: none;
-  clip-path: polygon(0% 0%, 100% 0%, 100% 95%, 50% 100%, 0% 95%);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 94%, 50% 100%, 0% 94%);
   animation: ribbonSway 4s ease-in-out infinite alternate;
   transform-origin: top center;
+  transform: translateX(-50%);
 }
 
 @keyframes ribbonSway {
-  0% { transform: rotate(0.5deg); }
-  100% { transform: rotate(-0.5deg); }
+  0% { transform: translateX(-50%) rotate(0.4deg); }
+  100% { transform: translateX(-50%) rotate(-0.4deg); }
 }

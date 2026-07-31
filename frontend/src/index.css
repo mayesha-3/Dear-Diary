@@ -1,8 +1,42 @@
+:root[data-theme="soft-ivory"] {
+  --text: #24324a;
+  --text-muted: #50627b;
+  --text-h: #17253b;
+  --bg: url('/assets/BGLight.png');
+  --surface: #fffdf8;
+  --surface-2: #f2ebdd;
+  --surface-3: #e5d9c3;
+  --border: #cdbb9a;
+  --code-bg: #f2ebdd;
+  --accent: #4b6bff;
+  --accent-strong: #3050d8;
+  --accent-soft: rgba(75, 107, 255, 0.18);
+  --accent-2: #3f63bb;
+  --social-bg: rgba(242, 235, 221, 0.8);
+  --shadow:
+    rgba(0, 0, 0, 0.15) 0 12px 28px -8px,
+    rgba(0, 0, 0, 0.12) 0 5px 10px -4px;
+
+  --sans: 'Patrick Hand', 'Comic Neue', cursive;
+  --heading: 'Shadows Into Light', 'Caveat', cursive;
+  --mono: 'Nanum Pen Script', cursive;
+
+  font: 18px/150% var(--sans);
+  letter-spacing: 0.3px;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 :root {
   --text: #f6f8ff;
   --text-muted: #ced8ff;
   --text-h: #ffffff;
-  --bg: #07111f;
+  --bg: url('/assets/BGDark.png');
   --surface: #111c32;
   --surface-2: #172645;
   --surface-3: #1e3151;
@@ -36,140 +70,13 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(95, 124, 255, 0.24), transparent 28%),
-    linear-gradient(135deg, #07111f 0%, #0d1830 45%, #111c32 100%);
+  background-image: var(--bg);
+  background-color: var(--surface);
+  background-size: cover;
+  background-position: center;
 }
 
-#root {
-  min-height: 100vh;
-}
-
-h1,
-h2,
-h3,
-h4 {
-  font-family: var(--heading);
-  font-weight: 400;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 48px;
-  letter-spacing: -1px;
-  margin: 28px 0;
-}
-h2 {
-  font-size: 22px;
-  line-height: 120%;
-  margin: 0 0 10px;
-}
-
-code {
-  font-family: var(--mono);
-  font-size: 16px;
-  background: var(--code-bg);
-  border-radius: 6px;
-  padding: 6px 10px;
-  color: var(--text-h);
-}
-
-a {
-  color: var(--accent-2);
-}
-
-a:hover {
-  color: var(--accent);
-}
-
-input,
-textarea,
-select {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  color: var(--text) !important;
-  border-color: var(--border) !important;
-}
-
-::placeholder {
-  color: var(--text-muted) !important;
-  opacity: 0.8;
-}
-
-button {
+option {
+  background-color: var(--surface-2);
   color: var(--text);
 }
-
-.bg-white,
-.bg-white-400,
-.bg-gray-50,
-.bg-gray-100,
-.bg-slate-50,
-.bg-slate-100,
-.bg-slate-200,
-.bg-zinc-50,
-.bg-zinc-100,
-.bg-blue-50 {
-  background-color: var(--surface) !important;
-}
-
-.bg-black,
-.bg-slate-900 {
-  background-color: var(--surface-3) !important;
-}
-
-.text-gray-700,
-.text-gray-800,
-.text-gray-600,
-.text-gray-500,
-.text-gray-300,
-.text-gray-400,
-.text-slate-500,
-.text-slate-700,
-.text-slate-800,
-.text-slate-900 {
-  color: var(--text-muted) !important;
-}
-
-.text-white {
-  color: #f9fbff !important;
-}
-
-.text-blue-900,
-.text-blue-800,
-.text-blue-700 {
-  color: var(--accent-2) !important;
-}
-
-.border-gray-300,
-.border-gray-200,
-.border-slate-200,
-.border-slate-300,
-.border-black {
-  border-color: var(--border) !important;
-}
-
-.shadow-2xl,
-.shadow-sm {
-  box-shadow: var(--shadow) !important;
-}
-
-.prose,
-.prose p,
-.prose li,
-.prose h1,
-.prose h2,
-.prose h3,
-.prose h4 {
-  color: var(--text) !important;
-}
-
-/* Fix for pages that are flipped in 3D book layout: ensure content editable areas
-   are not visually mirrored and use left-to-right text direction. */
-.face-back [contenteditable], .page-face.face-back [contenteditable], .page-card.flipped-card [contenteditable] {
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  direction: ltr !important;
-  unicode-bidi: plaintext !important;
-  backface-visibility: hidden;
-}
-

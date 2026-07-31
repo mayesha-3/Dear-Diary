@@ -10,7 +10,7 @@ export default function BookDupe() {
     if (isFlipping || currentPage <= 0) return;
     setIsFlipping(true);
     setCurrentPage((prev) => prev - 1);
-    setTimeout(() => setIsFlipping(false), 900); // cooldown matches transition
+    setTimeout(() => setIsFlipping(false), 900);
   };
 
   const flipRight = () => {
@@ -20,17 +20,15 @@ export default function BookDupe() {
     setTimeout(() => setIsFlipping(false), 900);
   };
 
-  // Trigger auto-open on mount (refresh)
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsFlipping(true);
       setCurrentPage(1);
       setTimeout(() => setIsFlipping(false), 900);
-    }, 1500); // Wait 1.5s then flip cover open
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Calculate dynamic z-index for realistic stacking
   const getZIndex = (index: number) => {
     const isFlipped = index < currentPage;
     return isFlipped ? index : totalCards - index;
@@ -39,21 +37,20 @@ export default function BookDupe() {
   return (
     <div className="journal-container">
       {/* Invisible Hover Flip Zones */}
-      <div 
-        className="hover-sensor-left" 
+      <div
+        className="hover-sensor-left"
         onMouseEnter={flipLeft}
         title="Hover to flip back"
       />
-      <div 
-        className="hover-sensor-right" 
+      <div
+        className="hover-sensor-right"
         onMouseEnter={flipRight}
         title="Hover to flip forward"
       />
 
       <div className="book-wrapper">
         <div className={`book-3d ${currentPage > 0 ? "open" : ""}`}>
-          
-          {/* Silk Ribbon Bookmark (visible only when book is open) */}
+          {/* Silk Ribbon Bookmark */}
           {currentPage > 0 && currentPage < totalCards && (
             <div className="ribbon-bookmark" />
           )}
@@ -62,47 +59,65 @@ export default function BookDupe() {
           <div
             className={`page-card ${currentPage > 0 ? "flipped-card" : ""}`}
             style={{ zIndex: getZIndex(0) }}
-            onClick={() => (currentPage > 0 ? flipLeft() : flipRight())}
-          >
-            {/* Front: Leather Cover */}
-            <div className="page-face leather-cover">
-              <div className="cover-corner corner-tl" />
-              <div className="cover-corner corner-tr" />
-              <div className="cover-corner corner-bl" />
-              <div className="cover-corner corner-br" />
-              
+            onClick={() => (currentPage > 0 ? flipLeft() : flipRight())}>
+            {/* Front: Pastel Cute Cover */}
+            <div className="page-face cute-cover">
+              <div className="cover-border-inner" />
+
+              {/* Cute Corner Stickers */}
+              <span className="cute-sticker top-left">🌸</span>
+              <span className="cute-sticker top-right">✨</span>
+              <span className="cute-sticker bottom-left">🎀</span>
+              <span className="cute-sticker bottom-right">🐈</span>
+
               <div className="cover-title-group">
-                <h1 className="cover-title">MY DIARY</h1>
-                <p className="cover-subtitle">collected memories</p>
+                <div className="cute-crest">☁️ 💖 ☁️</div>
+                <h1 className="cover-title">momo's diary</h1>
+                <div className="cute-divider" />
+                <p className="cover-subtitle">a little pocket of sunshine</p>
               </div>
-              
-              <div className="cover-emboss">M</div>
-              <p className="text-xs text-[#ffe494] opacity-50 tracking-widest uppercase">Mayesha</p>  {/*Show Username*/}
+
+              <div className="cover-badge">
+                <span>🌷</span>
+              </div>
+
+              <div className="cover-author">
+                <p className="text-xs font-serif tracking-[0.25em] uppercase text-[#7c5295] font-semibold">
+                  ~ sweet memories ~
+                </p>
+              </div>
             </div>
 
-            {/* Back: Page 1 (Welcome Page) */}
+            {/* Back: Page 1 (Welcome & Profile) */}
             <div className="page-face face-back">
               <div className="notebook-page">
-                <div className="diary-date">June 19, 2026</div>
+                <div className="diary-header-strip">
+                  <span className="diary-date">Feature Spotlight</span>
+                  <span className="weather-icon">🌸</span>
+                </div>
                 <div className="diary-text">
-                  <div className="washi-tape" style={{ top: '15px', right: '35px', transform: 'rotate(4deg)', background: '#d4edda' }}>
-                    My Day! 
-                  </div>
-                  <p className="mt-8">Hello there!</p>
-                  <p className="mt-2">
-                    Welcome to my little corner of the world. This is where I keep all my thoughts, daily entries, and memories.
+                  <div className="washi-tape tape-green">Safe Sanctuary ✨</div>
+                  <p className="mt-8 font-serif text-lg text-[#3e3228]">
+                    Welcome Home! ☁️
                   </p>
-                  
-                  {/* Polaroid Frame */}
-                  <div className="polaroid-frame" style={{ bottom: '35px', left: '45px', transform: 'rotate(-4deg)', width: '130px', height: '150px' }}>
-                    <div className="washi-tape" style={{ top: '-12px', left: '15px', transform: 'rotate(2deg)', background: '#ffeeba' }}>
-                      me 🌸
+                  <p className="mt-2 leading-relaxed text-[#5c4a3e]">
+                    Your quietest thoughts stay safe here. Cloud-synced
+                    instantly with Firebase Auth and real-time Firestore
+                    storage!
+                  </p>
+
+                  {/* Polaroid Profile Frame */}
+                  <div className="polaroid-frame">
+                    <div className="washi-tape tape-yellow">me 🌸</div>
+                    <div className="polaroid-img-wrapper">
+                      <img src="/src/assets/dp.png" alt="Profile" />
                     </div>
-                    <img src="/src/assets/dp.png" alt="Profile" />
-                    <div className="polaroid-caption">Mayesha</div>
+                    <div className="polaroid-caption">Momo</div>
                   </div>
 
-                  <span className="sticker-cute text-3xl" style={{ right: '40px', bottom: '60px', transform: 'rotate(10deg)' }}>⭐</span>
+                  <span className="sticker-cute floating-star text-3xl">
+                    ⭐
+                  </span>
                 </div>
                 <div className="page-shading" />
               </div>
@@ -113,56 +128,88 @@ export default function BookDupe() {
           <div
             className={`page-card ${currentPage > 1 ? "flipped-card" : ""}`}
             style={{ zIndex: getZIndex(1) }}
-            onClick={() => (currentPage > 1 ? flipLeft() : flipRight())}
-          >
-            {/* Front: Page 2 (Diary Entry) */}
+            onClick={() => (currentPage > 1 ? flipLeft() : flipRight())}>
+            {/* Front: Page 2 (Smart Writing & OCR Scanner) */}
             <div className="page-face">
               <div className="notebook-page">
-                {/* Spiral Ring Binder Hooks on the left of Page 2 (Right side page) */}
                 {currentPage === 1 && (
                   <div className="spine-spiral-rings">
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
+                    {[...Array(7)].map((_, i) => (
+                      <div key={i} className="spiral-ring" />
+                    ))}
                   </div>
                 )}
-                
-                <div className="diary-date">June 20, 2026</div>
+
+                <div className="diary-header-strip">
+                  <span className="diary-date">Smart Inputs</span>
+                  <span className="weather-icon">📸</span>
+                </div>
+
                 <div className="diary-text">
-                  <p>Dear Diary,</p>
-                  <p className="mt-2">
-                    Today I successfully migrated the entire backend to Firebase Authentication and Cloud Firestore! 
+                  <p className="font-serif font-semibold text-[#4a3b30]">
+                    Effortless Journaling ✍️
                   </p>
-                  <p className="mt-2">
-                    The MongoDB dependencies are gone, and the database calls are now blazing fast. I also designed a gorgeous parchment-style authentication page. Writing diaries is so much fun now!
+                  <p className="mt-2 leading-relaxed">
+                    <b>• Smart AI Voice:</b> Speak your mind and let ambient
+                    speech-to-text transcribe your entries automatically.
                   </p>
-                  
-                  <span className="sticker-cute text-4xl" style={{ right: '25px', bottom: '50px', transform: 'rotate(-12deg)' }}>🐈</span>
-                  <span className="sticker-cute text-3xl" style={{ left: '40px', bottom: '40px', transform: 'rotate(15deg)' }}>☕</span>
+                  <p className="mt-2 leading-relaxed">
+                    <b>• Scan Physical Pages:</b> Snap a photo of physical
+                    handwritten journals and import them seamlessly into digital
+                    memory.
+                  </p>
+
+                  <div className="sticker-group">
+                    <span className="sticker-cute text-3xl hover:scale-125 transition-transform">
+                      🎙️
+                    </span>
+                    <span className="sticker-cute text-2xl hover:scale-125 transition-transform">
+                      📷
+                    </span>
+                  </div>
                 </div>
                 <div className="page-shading" />
               </div>
             </div>
 
-            {/* Back: Page 3 (Summer Checklist) */}
+            {/* Back: Page 3 (App Capabilities Checklist) */}
             <div className="page-face face-back">
               <div className="notebook-page">
-                <div className="diary-date">Checklist</div>
+                <div className="diary-header-strip">
+                  <span className="diary-date">Toolbox</span>
+                  <span className="weather-icon">🛠️</span>
+                </div>
                 <div className="diary-text">
-                  <h3 className="font-semibold text-[#8c7355] text-lg mb-2">Summer Wishlist 🌸</h3>
-                  <ul className="cute-todo-list">
-                    <li>Read at least 5 books 📖</li>
-                    <li>Visit the botanical gardens 🌸</li>
-                    <li>Learn watercolor painting 🎨</li>
-                    <li>Build beautiful React animations 💻</li>
-                    <li>Bake a strawberry shortcake 🍰</li>
+                  <h3 className="font-serif font-bold text-[#8c7355] text-lg mb-2 flex items-center gap-2">
+                    <span>What You Can Do</span>
+                    <span>✨</span>
+                  </h3>
+                  <ul className="cute-todo-list space-y-1.5">
+                    <li>
+                      <input type="checkbox" defaultChecked readOnly />{" "}
+                      Real-time Firestore Cloud Sync ☁️
+                    </li>
+                    <li>
+                      <input type="checkbox" defaultChecked readOnly /> Custom
+                      Sticker Factory & Drag-and-Drop 🎨
+                    </li>
+                    <li>
+                      <input type="checkbox" defaultChecked readOnly />{" "}
+                      Background Ambient Audio Player 🎵
+                    </li>
+                    <li>
+                      <input type="checkbox" defaultChecked readOnly /> Page OCR
+                      & Camera Diary Importer 📸
+                    </li>
+                    <li>
+                      <input type="checkbox" defaultChecked readOnly /> Full
+                      Memory Search & Filter Archives 🔍
+                    </li>
                   </ul>
-                  
-                  <span className="sticker-cute text-4xl" style={{ right: '40px', bottom: '30px', transform: 'rotate(5deg)' }}>☘️</span>
+
+                  <span className="sticker-cute bottom-right-clover text-4xl">
+                    ☘️
+                  </span>
                 </div>
                 <div className="page-shading" />
               </div>
@@ -173,58 +220,81 @@ export default function BookDupe() {
           <div
             className={`page-card ${currentPage > 2 ? "flipped-card" : ""}`}
             style={{ zIndex: getZIndex(2) }}
-            onClick={() => (currentPage > 2 ? flipLeft() : flipRight())}
-          >
-            {/* Front: Page 4 (Watercolor Quote) */}
+            onClick={() => (currentPage > 2 ? flipLeft() : flipRight())}>
+            {/* Front: Page 4 (Atmosphere & Aesthetic Focus) */}
             <div className="page-face">
-              <div className="notebook-page" style={{ background: 'linear-gradient(135deg, #fdfaf2 40%, #fff0f0 100%)' }}>
+              <div className="notebook-page quote-page-bg">
                 {currentPage === 2 && (
                   <div className="spine-spiral-rings">
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
+                    {[...Array(7)].map((_, i) => (
+                      <div key={i} className="spiral-ring" />
+                    ))}
                   </div>
                 )}
-                
-                <div className="diary-date">Inspiration</div>
-                <div className="diary-text flex flex-col justify-center items-center text-center px-4" style={{ height: '80%' }}>
-                  <span className="text-4xl mb-4 text-[#c97b63]">“</span>
-                  <p className="text-2xl font-bold italic text-[#6e5d4f]" style={{ fontFamily: 'var(--heading)' }}>
-                    Write your own story, page by page.
+
+                <div className="diary-header-strip">
+                  <span className="diary-date">Ambience</span>
+                  <span className="weather-icon">🎧</span>
+                </div>
+
+                <div className="diary-text flex flex-col justify-center items-center text-center px-4 h-[75%]">
+                  <span className="text-4xl text-[#c97b63] font-serif leading-none opacity-80">
+                    “
+                  </span>
+                  <p className="text-2xl font-serif font-bold italic text-[#5a483c] my-2 leading-tight">
+                    Immersion in every keystroke.
                   </p>
-                  <p className="text-lg mt-2 text-[#8c7355] italic">Make it count, make it beautiful.</p>
-                  <span className="text-4xl mt-2 text-[#c97b63]">”</span>
-                  
-                  <div className="washi-tape" style={{ bottom: '20px', transform: 'rotate(2deg)', background: '#d1ecf1', width: '120px', textAlign: 'center' }}>
-                    Keep Writing ✍️
+                  <p className="text-sm text-[#8c7355] italic font-serif">
+                    Soft lo-fi melodies, calming soundscapes, and tactile 3D
+                    page flips.
+                  </p>
+                  <span className="text-4xl text-[#c97b63] font-serif leading-none opacity-80">
+                    ”
+                  </span>
+
+                  <div className="washi-tape tape-blue mt-6">
+                    Global Audio On 🎵
                   </div>
                 </div>
                 <div className="page-shading" />
               </div>
             </div>
 
-            {/* Back: Page 5 (Sticker Album) */}
+            {/* Back: Page 5 (Sticker Factory Showcase) */}
             <div className="page-face face-back">
               <div className="notebook-page">
-                <div className="diary-date">Sticker Board</div>
+                <div className="diary-header-strip">
+                  <span className="diary-date">Sticker Board</span>
+                  <span className="weather-icon">🎨</span>
+                </div>
                 <div className="diary-text">
-                  <h3 className="font-semibold text-[#8c7355] text-lg mb-4 text-center">My Sticker Collection</h3>
-                  
-                  <div className="grid grid-cols-3 gap-6 mt-6 justify-items-center">
-                    <span className="sticker-cute text-4xl static hover:scale-125 transition">🧸</span>
-                    <span className="sticker-cute text-4xl static hover:scale-125 transition">🎨</span>
-                    <span className="sticker-cute text-4xl static hover:scale-125 transition">🦋</span>
-                    <span className="sticker-cute text-4xl static hover:scale-125 transition">🍨</span>
-                    <span className="sticker-cute text-4xl static hover:scale-125 transition">💌</span>
-                    <span className="sticker-cute text-4xl static hover:scale-125 transition">🌟</span>
+                  <h3 className="font-serif font-semibold text-[#8c7355] text-base mb-3 text-center tracking-wide">
+                    ✨ Sticker Factory Collection ✨
+                  </h3>
+
+                  <div className="grid grid-cols-3 gap-5 mt-3 justify-items-center bg-[#fdf8f0] p-4 rounded-2xl border border-[#ebdcc9]">
+                    <span className="sticker-cute text-4xl hover:rotate-6 transition-transform">
+                      🧸
+                    </span>
+                    <span className="sticker-cute text-4xl hover:-rotate-6 transition-transform">
+                      🎨
+                    </span>
+                    <span className="sticker-cute text-4xl hover:rotate-12 transition-transform">
+                      🦋
+                    </span>
+                    <span className="sticker-cute text-4xl hover:-rotate-12 transition-transform">
+                      🍨
+                    </span>
+                    <span className="sticker-cute text-4xl hover:rotate-6 transition-transform">
+                      💌
+                    </span>
+                    <span className="sticker-cute text-4xl hover:-rotate-6 transition-transform">
+                      🌟
+                    </span>
                   </div>
-                  
-                  <div className="washi-tape" style={{ bottom: '35px', left: '30%', transform: 'rotate(-4deg)', background: '#e2e3e5' }}>
-                    Sticker Factory 🏭
+
+                  <div className="washi-tape tape-grey center-tape">
+                    Design Your Own 🏭
                   </div>
                 </div>
                 <div className="page-shading" />
@@ -236,56 +306,63 @@ export default function BookDupe() {
           <div
             className={`page-card ${currentPage > 3 ? "flipped-card" : ""}`}
             style={{ zIndex: getZIndex(3) }}
-            onClick={() => (currentPage > 3 ? flipLeft() : flipRight())}
-          >
-            {/* Front: Page 6 (Final Entry & Sign-off) */}
+            onClick={() => (currentPage > 3 ? flipLeft() : flipRight())}>
+            {/* Front: Page 6 (Memory Preservation) */}
             <div className="page-face">
               <div className="notebook-page">
                 {currentPage === 3 && (
                   <div className="spine-spiral-rings">
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
-                    <div className="spiral-ring" />
+                    {[...Array(7)].map((_, i) => (
+                      <div key={i} className="spiral-ring" />
+                    ))}
                   </div>
                 )}
-                
-                <div className="diary-date">June 20, 2026</div>
+
+                <div className="diary-header-strip">
+                  <span className="diary-date">Memories</span>
+                  <span className="weather-icon">🌙</span>
+                </div>
+
                 <div className="diary-text">
-                  <p>Goodnight,</p>
-                  <p className="mt-2">
-                    It's late at night, and the stars are shining outside. The room is quiet, and the gentle hum of my PC is the only sound. 
+                  <p className="font-serif font-medium text-[#4a3b30]">
+                    Your Journey Awaits,
                   </p>
-                  <p className="mt-2">
-                    It's time to close the diary pages for today. Talk to you tomorrow, dear diary.
+                  <p className="mt-2 leading-relaxed">
+                    Filter by date, tag special moments, and search through past
+                    memories with ease.
                   </p>
-                  <p className="mt-8 text-right font-bold text-xl text-[#c97b63]">
-                    Mayesha ✍️ ❤️
+                  <p className="mt-2 leading-relaxed">
+                    Start a new entry today and make this space uniquely yours.
                   </p>
-                  
-                  <span className="sticker-cute text-3xl" style={{ left: '35px', bottom: '45px', transform: 'rotate(-5deg)' }}>🌙</span>
+
+                  <div className="mt-8 text-right">
+                    <p className="font-serif font-bold text-xl text-[#c97b63] tracking-wide">
+                      Momo ✍️ ❤️
+                    </p>
+                  </div>
+
+                  <span className="sticker-cute moon-sticker text-3xl">🌙</span>
                 </div>
                 <div className="page-shading" />
               </div>
             </div>
 
-            {/* Back: Back Cover */}
-            <div className="page-face face-back leather-cover">
-              <div className="cover-corner corner-tl" />
-              <div className="cover-corner corner-tr" />
-              <div className="cover-corner corner-bl" />
-              <div className="cover-corner corner-br" />
-              
-              <div className="cover-title-group" style={{ marginTop: '45%' }}>
-                <span className="text-4xl opacity-40">⚜️</span>
+            {/* Back: Pastel Cute Back Cover */}
+            <div className="page-face face-back cute-cover">
+              <div className="cover-border-inner" />
+
+              <div className="cover-title-group my-auto text-center">
+                <span className="text-5xl filter drop-shadow">🌷</span>
+                <p className="font-serif italic text-[#7c5295] text-sm mt-3 font-medium">
+                  "Thanks for reading!"
+                </p>
               </div>
-              <p className="text-xs text-[#ffe494] opacity-30 mt-auto uppercase tracking-wider">Dear Diary Back Cover</p>
+
+              <p className="text-[11px] text-[#8e689e] font-serif tracking-[0.2em] uppercase mb-4 font-semibold">
+                Momo's Diary • Made with Love 💖
+              </p>
             </div>
           </div>
-
         </div>
       </div>
     </div>

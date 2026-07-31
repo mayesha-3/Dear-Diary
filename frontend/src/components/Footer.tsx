@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const footerDetails: Record<string, string> = {
-  'Contact Us': 'Reach out anytime for support, feedback, or help with your diary experience.',
-  'Our Services': 'Explore journal tools, private entries, sticker customization, and a calm personal space.',
-  'FAQs': 'Need help getting started? You can create entries, save drafts, and customize your settings in seconds.',
-  'Privacy Policy': 'Your journals are treated with care, and your personal data remains protected with privacy-first design.',
-  'Cookie Policy': 'We use essential cookies to keep the app functional and improve your experience while you browse.',
-  'Website Terms of Use': 'By using Dear Diary, you agree to keep the experience respectful, secure, and personal to each user.',
-  'Code of Conduct': 'We encourage thoughtful, kind, and safe interactions for everyone using the platform.',
-  'About Us': 'Dear Diary was created to help people capture memories, emotions, and reflections in a peaceful space.',
+  "Contact Us":
+    "Reach out anytime for support, feedback, or help with your diary experience.",
+  "Our Services":
+    "Explore journal tools, private entries, sticker customization, and a calm personal space.",
+  FAQs: "Need help getting started? You can create entries, save drafts, and customize your settings in seconds.",
+  "Privacy Policy":
+    "Your journals are treated with care, and your personal data remains protected with privacy-first design.",
+  "Cookie Policy":
+    "We use essential cookies to keep the app functional and improve your experience while you browse.",
+  "Website Terms of Use":
+    "By using Dear Diary, you agree to keep the experience respectful, secure, and personal to each user.",
+  "Code of Conduct":
+    "We encourage thoughtful, kind, and safe interactions for everyone using the platform.",
+  "About Us":
+    "Dear Diary was created to help people capture memories, emotions, and reflections in a peaceful space.",
 };
 
 function Footer() {
@@ -17,25 +24,29 @@ function Footer() {
   return (
     <>
       <div
-        style={{ background: 'linear-gradient(90deg, #0a1020, #172645)', color: 'var(--text)', borderTop: '1px solid var(--border)' }}
-        className="mt-12"
-      >
+        style={{
+          background: "var(--surface-2)",
+          color: "var(--text)",
+          borderTop: "1px solid var(--border)",
+        }}
+        className="mt-12 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-8 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Client Services */}
             <div>
-              <h3 className="text-sm font-bold tracking-widest mb-4" style={{ color: 'var(--text-h)' }}>
+              <h3
+                className="text-sm font-bold tracking-widest mb-4"
+                style={{ color: "var(--text-h)" }}>
                 CLIENT SERVICES
               </h3>
 
-              <ul className="space-y-2" style={{ color: 'var(--text-muted)' }}>
-                {['Contact Us', 'Our Services', 'FAQs'].map((item) => (
+              <ul className="space-y-2" style={{ color: "var(--text-muted)" }}>
+                {["Contact Us", "Our Services", "FAQs"].map((item) => (
                   <li key={item}>
                     <button
                       type="button"
                       onClick={() => setActiveItem(item)}
-                      className="text-left hover:text-white transition"
-                    >
+                      className="text-left transition hover:opacity-70">
                       {item}
                     </button>
                   </li>
@@ -45,18 +56,24 @@ function Footer() {
 
             {/* Legal & Privacy */}
             <div>
-              <h3 className="text-sm font-bold tracking-widest mb-4" style={{ color: 'var(--text-h)' }}>
+              <h3
+                className="text-sm font-bold tracking-widest mb-4"
+                style={{ color: "var(--text-h)" }}>
                 LEGAL & PRIVACY
               </h3>
 
-              <ul className="space-y-2" style={{ color: 'var(--text-muted)' }}>
-                {['Privacy Policy', 'Cookie Policy', 'Website Terms of Use', 'Code of Conduct'].map((item) => (
+              <ul className="space-y-2" style={{ color: "var(--text-muted)" }}>
+                {[
+                  "Privacy Policy",
+                  "Cookie Policy",
+                  "Website Terms of Use",
+                  "Code of Conduct",
+                ].map((item) => (
                   <li key={item}>
                     <button
                       type="button"
                       onClick={() => setActiveItem(item)}
-                      className="text-left hover:text-white transition"
-                    >
+                      className="text-left transition hover:opacity-70">
                       {item}
                     </button>
                   </li>
@@ -66,17 +83,18 @@ function Footer() {
 
             {/* Corporate */}
             <div>
-              <h3 className="text-sm font-bold tracking-widest mb-4" style={{ color: 'var(--text-h)' }}>
+              <h3
+                className="text-sm font-bold tracking-widest mb-4"
+                style={{ color: "var(--text-h)" }}>
                 CORPORATE
               </h3>
 
-              <ul className="space-y-2" style={{ color: 'var(--text-muted)' }}>
+              <ul className="space-y-2" style={{ color: "var(--text-muted)" }}>
                 <li>
                   <button
                     type="button"
-                    onClick={() => setActiveItem('About Us')}
-                    className="text-left hover:text-white transition"
-                  >
+                    onClick={() => setActiveItem("About Us")}
+                    className="text-left transition hover:opacity-70">
                     About Us
                   </button>
                 </li>
@@ -88,7 +106,8 @@ function Footer() {
                   <img
                     src="/src/assets/facebook.png"
                     alt="Facebook"
-                    className="w-6 h-6 invert hover:scale-110 transition"
+                    className="w-6 h-6 hover:scale-110 transition"
+                    style={{ filter: "var(--social-filter, none)" }}
                   />
                 </a>
 
@@ -96,7 +115,8 @@ function Footer() {
                   <img
                     src="/src/assets/instagram.png"
                     alt="Instagram"
-                    className="w-6 h-6 invert hover:scale-110 transition"
+                    className="w-6 h-6 hover:scale-110 transition"
+                    style={{ filter: "var(--social-filter, none)" }}
                   />
                 </a>
 
@@ -104,7 +124,8 @@ function Footer() {
                   <img
                     src="/src/assets/youtube.png"
                     alt="YouTube"
-                    className="w-6 h-6 invert hover:scale-110 transition"
+                    className="w-6 h-6 hover:scale-110 transition"
+                    style={{ filter: "var(--social-filter, none)" }}
                   />
                 </a>
               </div>
@@ -112,33 +133,50 @@ function Footer() {
           </div>
         </div>
 
-        <hr className="border-gray-700" />
+        <hr style={{ borderColor: "var(--border)" }} />
 
-        <div className="text-center text-xs py-4 px-4" style={{ color: 'var(--text-muted)' }}>
-          © 2026 Dear Diary — All Rights Reserved. Your Personal Digital Journal.
+        <div
+          className="text-center text-xs py-4 px-4"
+          style={{ color: "var(--text-muted)" }}>
+          © 2026 Dear Diary — All Rights Reserved. Your Personal Digital
+          Journal.
         </div>
       </div>
 
       {activeItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
-          onClick={() => setActiveItem(null)}
-        >
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          onClick={() => setActiveItem(null)}>
           <div
-            className="w-full max-w-xl rounded-2xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+            className="w-full max-w-xl rounded-2xl border p-6 shadow-2xl"
+            style={{
+              background: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
+            onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">{activeItem}</h3>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: "var(--text-h)" }}>
+                {activeItem}
+              </h3>
               <button
                 type="button"
                 onClick={() => setActiveItem(null)}
-                className="rounded-full border border-white/20 px-3 py-1 text-sm text-slate-300 hover:text-white"
-              >
+                className="rounded-full border px-3 py-1 text-sm hover:opacity-80"
+                style={{
+                  background: "var(--surface-3)",
+                  borderColor: "var(--border)",
+                  color: "var(--text)",
+                }}>
                 Close
               </button>
             </div>
-            <p className="text-sm leading-7 text-slate-300">{footerDetails[activeItem]}</p>
+            <p
+              className="text-sm leading-7"
+              style={{ color: "var(--text-muted)" }}>
+              {footerDetails[activeItem]}
+            </p>
           </div>
         </div>
       )}
