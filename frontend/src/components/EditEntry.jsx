@@ -1,15 +1,17 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api, { uploadImage } from '../api/api';
-import { auth } from '../firebase';
+import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api, { uploadImage } from "../api/api";
+import { auth } from "../firebase";
 
 // Base URL of the API server, used to resolve "/uploads/.." paths
 // returned by the upload route into full <img src> URLs.
-const ASSET_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace(/\/api\/?$/, '');
+const ASSET_BASE_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:5001/api"
+).replace(/\/api\/?$/, "");
 
 function resolveAssetUrl(url) {
   if (!url) return url;
-  return url.startsWith('http') ? url : `${ASSET_BASE_URL}${url}`;
+  return url.startsWith("http") ? url : `${ASSET_BASE_URL}${url}`;
 }
 
 function generateId() {
@@ -23,8 +25,9 @@ function todayISODate() {
   return local.toISOString().slice(0, 10);
 }
 
-export default function NewEntry() {
+export default function EditEntry() {
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const [title, setTitle] = useState("");
   const [entryDate, setEntryDate] = useState(todayISODate());
@@ -32,6 +35,7 @@ export default function NewEntry() {
   const [mood, setMood] = useState("");
   const [activity, setActivity] = useState("");
   const [messageToSelf, setMessageToSelf] = useState("");
+  const [pageLoading, setPageLoading] = useState(true);
 
   // Stickers: { stickerId, imageUrl, x, y, width, rotation, zIndex }
   // x / y are percentages of the page container's width/height so the
@@ -41,7 +45,7 @@ export default function NewEntry() {
   const [selectedStickerId, setSelectedStickerId] = useState(null);
   const [pastStickers, setPastStickers] = useState([]);
   const [showStickerPanel, setShowStickerPanel] = useState(false);
-  const [insertMode, setInsertMode] = useState('inline'); // 'inline' or 'behind'
+  const [insertMode, setInsertMode] = useState("inline"); // 'inline' or 'behind'
   const contentRef = useRef(null);
   const [selectedInlineImage, setSelectedInlineImage] = useState(null);
 
@@ -153,14 +157,16 @@ export default function NewEntry() {
   // Load user's saved stickers for the sidebar
   const loadPastStickers = useCallback(async () => {
     try {
-      const res = await api.get('/stickers');
+      const res = await api.get("/stickers");
       setPastStickers(res.data.stickers || []);
     } catch (err) {
-      console.error('Failed to load past stickers', err);
+      console.error("Failed to load past stickers", err);
     }
   }, []);
 
-  useEffect(() => { loadPastStickers(); }, [loadPastStickers]);
+  useEffect(() => {
+    loadPastStickers();
+  }, [loadPastStickers]);
 
   // Insert an image node at the current caret position inside the contenteditable
   const insertImageAtCaret = async (imageUrl, width = 120) => {
@@ -170,13 +176,13 @@ export default function NewEntry() {
       contentRef.current && contentRef.current.focus();
     }
     const range = sel ? sel.getRangeAt(0) : null;
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = imageUrl;
     img.style.width = `${width}px`;
-    img.style.maxWidth = '100%';
-    img.className = 'inline-sticker';
+    img.style.maxWidth = "100%";
+    img.className = "inline-sticker";
     img.dataset.stickerId = generateId();
-    img.addEventListener('click', (ev) => {
+    img.addEventListener("click", (ev) => {
       ev.stopPropagation();
       setSelectedInlineImage(img.dataset.stickerId);
       // mark this image with a data-id so we can find it later
@@ -193,20 +199,22 @@ export default function NewEntry() {
       contentRef.current.appendChild(img);
     }
     // update controlled state
-    setContent(contentRef.current ? contentRef.current.innerHTML : '');
+    setContent(contentRef.current ? contentRef.current.innerHTML : "");
   };
 
   const handlePaste = async (e) => {
     if (!e.clipboardData) return;
     const items = Array.from(e.clipboardData.items || []);
-    const imageItem = items.find((it) => it.type && it.type.startsWith('image'));
+    const imageItem = items.find(
+      (it) => it.type && it.type.startsWith("image"),
+    );
     if (imageItem) {
       e.preventDefault();
       const file = imageItem.getAsFile();
       if (!file) return;
       try {
         const imageUrl = await uploadImage(file);
-        if (insertMode === 'inline') {
+        if (insertMode === "inline") {
           await insertImageAtCaret(resolveAssetUrl(imageUrl));
         } else {
           // behind: add to stickers array as a positioned background element
@@ -223,14 +231,14 @@ export default function NewEntry() {
           setStickers((prev) => [...prev, sticker]);
         }
       } catch (err) {
-        console.error('Paste upload failed', err);
+        console.error("Paste upload failed", err);
       }
     }
   };
 
   // Click from sidebar to insert sticker
   const handleSidebarInsert = async (sticker) => {
-    if (insertMode === 'inline') {
+    if (insertMode === "inline") {
       await insertImageAtCaret(resolveAssetUrl(sticker.imageUrl));
     } else {
       const newSticker = {
@@ -268,7 +276,12 @@ export default function NewEntry() {
     const offsetXPercent = mouseXPercent - sticker.x;
     const offsetYPercent = mouseYPercent - sticker.y;
 
-    dragState.current = { stickerId, mode: 'move', offsetXPercent, offsetYPercent };
+    dragState.current = {
+      stickerId,
+      mode: "move",
+      offsetXPercent,
+      offsetYPercent,
+    };
     setSelectedStickerId(stickerId);
   };
 
@@ -280,7 +293,7 @@ export default function NewEntry() {
     if (!sticker) return;
     dragState.current = {
       stickerId,
-      mode: 'resize',
+      mode: "resize",
       startClientX: e.clientX,
       startClientY: e.clientY,
       startWidth: sticker.width,
@@ -293,7 +306,7 @@ export default function NewEntry() {
 
     const rect = pageRef.current.getBoundingClientRect();
     const ds = dragState.current;
-    if (ds.mode === 'move') {
+    if (ds.mode === "move") {
       const { stickerId, offsetXPercent, offsetYPercent } = ds;
 
       const newXPercent = Math.max(
@@ -318,7 +331,7 @@ export default function NewEntry() {
             : s,
         ),
       );
-    } else if (ds.mode === 'resize') {
+    } else if (ds.mode === "resize") {
       const { stickerId, startClientX, startWidth } = ds;
       const deltaX = e.clientX - startClientX;
       setStickers((prev) =>
@@ -373,12 +386,12 @@ export default function NewEntry() {
           picOfTheDay: picOfDay,
         };
 
-        const res = await api.post("/entries", payload);
-        setSuccessMsg("Entry saved successfully!");
+        const res = await api.put(`/entries/${id}`, payload);
+        setSuccessMsg("Entry updated successfully!");
 
-        // Redirect to the new entry after a short delay
+        // Redirect to the updated entry after a short delay
         setTimeout(() => {
-          navigate(`/entry/${res.data.entryId}`);
+          navigate(`/entry/${id}`);
         }, 500);
       } catch (err) {
         console.error(err);
@@ -390,52 +403,83 @@ export default function NewEntry() {
     [title, content, entryDate, stickers, picOfDay, mood, activity, messageToSelf, navigate],
   );
 
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchEntry() {
+      try {
+        const res = await api.get(`/entries/${id}`);
+        if (!cancelled && res.data.entry) {
+          const e = res.data.entry;
+          setTitle(e.title || "");
+          if (e.entryDate) setEntryDate(e.entryDate.slice(0, 10));
+          setContent(e.content || "");
+          setStickers(e.stickers || []);
+          if (e.picOfTheDay) setPicOfDay(e.picOfTheDay);
+          setMood(e.mood || "");
+          setActivity(e.activity || "");
+          setMessageToSelf(e.messageToSelf || "");
+        }
+      } catch (err) {
+        console.error("Failed to fetch entry", err);
+        setErrorMsg("Failed to load entry for editing.");
+      } finally {
+        if (!cancelled) setPageLoading(false);
+      }
+    }
+    fetchEntry();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (pageLoading) {
+    return (
+      <main className="container mx-auto mt-8 p-6 bg-white border-[3px] border-black rounded-[40px] shadow-2xl relative overflow-hidden">
+        <div className="p-8 text-center">Loading entry...</div>
+      </main>
+    );
+  }
+
   return (
-    <main className="container mx-auto mt-8 p-6 rounded-[40px] shadow-2xl relative overflow-hidden" style={{ background: 'rgba(17, 28, 50, 0.96)', border: '1px solid var(--border)' }}>
+    <main className="container mx-auto mt-8 p-6 bg-white border-[3px] border-black rounded-[40px] shadow-2xl relative overflow-hidden">
       {/* Scrapbook Header */}
-<div className="relative text-center py-8">
+      <div className="relative text-center py-8">
+        <div className="absolute left-10 top-0 text-2xl">☁</div>
+        <div className="absolute left-32 top-4 text-xl">✦</div>
 
-  <div className="absolute left-10 top-0 text-2xl">☁</div>
-  <div className="absolute left-32 top-4 text-xl">✦</div>
+        <div className="absolute right-10 top-0 text-2xl">♡</div>
+        <div className="absolute right-28 top-5 text-xl">☾</div>
 
-  <div className="absolute right-10 top-0 text-2xl">♡</div>
-  <div className="absolute right-28 top-5 text-xl">☾</div>
-
-  <h2 className="text-2xl font-black tracking-widest">
-    New Entry
-  </h2>
-
-</div>
+        <h2 className="text-2xl font-black tracking-widest">Edit Entry</h2>
+      </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Title</label>
+          <label className="block text-sm font-medium mb-2">Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border rounded"
             placeholder="Entry title"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text)', borderColor: 'var(--border)' }}
           />
         </div>
 
         {/* Entry Date */}
         <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Date</label>
+          <label className="block text-sm font-medium mb-2">Date</label>
           <input
             type="date"
             value={entryDate}
             onChange={(e) => setEntryDate(e.target.value)}
             className="w-full px-4 py-2 border rounded"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text)', borderColor: 'var(--border)' }}
           />
         </div>
 
         {/* NEW: PDF Document Scanning Component */}
-        <div className="p-4 rounded-md" style={{ background: 'rgba(111,141,255,0.14)', border: '1px solid rgba(111,141,255,0.28)' }}>
-          <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-h)' }}>
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
+          <label className="block text-sm font-semibold text-blue-900 mb-2">
             ✨ Autofill via PDF Scan
           </label>
           <input
@@ -443,11 +487,10 @@ export default function NewEntry() {
             accept="application/pdf"
             onChange={handlePdfScan}
             disabled={pdfScanning}
-            className="block text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#3557c7] file:text-white hover:file:bg-[#2947a8] disabled:opacity-50"
-            style={{ color: 'var(--text-muted)' }}
+            className="block text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-white hover:file:bg-blue-800 disabled:opacity-50"
           />
           {pdfScanning && (
-            <p className="text-xs font-medium mt-2 animate-pulse" style={{ color: 'var(--accent-2)' }}>
+            <p className="text-xs font-medium text-blue-700 mt-2 animate-pulse">
               Running Python AI pipeline... reading PDF data...
             </p>
           )}
@@ -455,14 +498,32 @@ export default function NewEntry() {
 
         {/* Content Box (contenteditable for inline images) */}
         <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Content</label>
+          <label className="block text-sm font-medium mb-2">Content</label>
           <div className="flex items-start gap-4">
             <div className="flex-1">
               <div className="relative w-full">
                 <div className="absolute inset-0 pointer-events-none">
-                  {stickers.filter(s=>s.behind).map((st)=>(
-                    <img key={st.stickerId} src={resolveAssetUrl(st.imageUrl)} alt="behind" style={{position:'absolute', left:`${st.x}%`, top:`${st.y}%`, width:`${st.width}px`, transform:'translate(-50%,-50%) rotate('+st.rotation+'deg)', zIndex: st.zIndex, opacity:0.9}} />
-                  ))}
+                  {stickers
+                    .filter((s) => s.behind)
+                    .map((st) => (
+                      <img
+                        key={st.stickerId}
+                        src={resolveAssetUrl(st.imageUrl)}
+                        alt="behind"
+                        style={{
+                          position: "absolute",
+                          left: `${st.x}%`,
+                          top: `${st.y}%`,
+                          width: `${st.width}px`,
+                          transform:
+                            "translate(-50%,-50%) rotate(" +
+                            st.rotation +
+                            "deg)",
+                          zIndex: st.zIndex,
+                          opacity: 0.9,
+                        }}
+                      />
+                    ))}
                 </div>
                 <div
                   ref={contentRef}
@@ -473,34 +534,70 @@ export default function NewEntry() {
                   dir="ltr"
                   suppressContentEditableWarning
                   className="w-full px-4 py-3 border rounded font-mono text-sm min-h-[240px] bg-transparent relative z-20"
-                  style={{direction:'ltr', unicodeBidi:'plaintext'}}
+                  style={{ direction: "ltr", unicodeBidi: "plaintext" }}
                 />
               </div>
-              <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+              <p className="text-xs text-gray-500 mt-2">
                 Paste images (Ctrl/Cmd+V) to insert stickers directly.
               </p>
             </div>
             <div className="w-48">
               <div className="mb-3">
-                <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Stickers</label>
-                <button type="button" onClick={() => { setShowStickerPanel((s)=>!s); loadPastStickers(); }} className="mt-2 w-full px-3 py-2 rounded" style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--text)' }}>Open Stickers</button>
+                <label className="block text-sm font-medium">Stickers</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowStickerPanel((s) => !s);
+                    loadPastStickers();
+                  }}
+                  className="mt-2 w-full px-3 py-2 bg-slate-100 rounded">
+                  Open Stickers
+                </button>
               </div>
               <div className="mb-3">
-                <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Insert Mode</label>
+                <label className="block text-sm font-medium">Insert Mode</label>
                 <div className="mt-2 space-x-2">
-                  <label className="inline-flex items-center" style={{ color: 'var(--text-muted)' }}><input type="radio" name="insertMode" checked={insertMode==='inline'} onChange={()=>setInsertMode('inline')} /> <span className="ml-2">Inline</span></label>
-                  <label className="inline-flex items-center ml-3" style={{ color: 'var(--text-muted)' }}><input type="radio" name="insertMode" checked={insertMode==='behind'} onChange={()=>setInsertMode('behind')} /> <span className="ml-2">Behind text</span></label>
+                  <label className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name="insertMode"
+                      checked={insertMode === "inline"}
+                      onChange={() => setInsertMode("inline")}
+                    />{" "}
+                    <span className="ml-2">Inline</span>
+                  </label>
+                  <label className="inline-flex items-center ml-3">
+                    <input
+                      type="radio"
+                      name="insertMode"
+                      checked={insertMode === "behind"}
+                      onChange={() => setInsertMode("behind")}
+                    />{" "}
+                    <span className="ml-2">Behind text</span>
+                  </label>
                 </div>
               </div>
               {selectedInlineImage && (
-                <div className="p-2 border rounded" style={{ borderColor: 'var(--border)', background: 'rgba(255,255,255,0.05)' }}>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>Selected Image Controls</p>
-                  <label className="text-xs" style={{ color: 'var(--text-muted)' }}>Width</label>
-                  <input type="range" min="20" max="800" onChange={(e)=>{
-                    const el = contentRef.current.querySelector(`img[data-sticker-id='${selectedInlineImage}']`);
-                    if (el){ el.style.width = `${e.target.value}px`; setContent(contentRef.current.innerHTML); }
-                  }} />
-                  <div className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>Click an inline image to select it and adjust size.</div>
+                <div className="p-2 border rounded">
+                  <p className="text-sm font-medium">Selected Image Controls</p>
+                  <label className="text-xs">Width</label>
+                  <input
+                    type="range"
+                    min="20"
+                    max="800"
+                    onChange={(e) => {
+                      const el = contentRef.current.querySelector(
+                        `img[data-sticker-id='${selectedInlineImage}']`,
+                      );
+                      if (el) {
+                        el.style.width = `${e.target.value}px`;
+                        setContent(contentRef.current.innerHTML);
+                      }
+                    }}
+                  />
+                  <div className="text-xs text-slate-500 mt-2">
+                    Click an inline image to select it and adjust size.
+                  </div>
                 </div>
               )}
             </div>
@@ -508,116 +605,105 @@ export default function NewEntry() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
+          {/* Left Side */}
 
-  {/* Left Side */}
+          <div className="relative">
+            <div className="absolute -top-5 -left-4 rotate-[-20deg] text-3xl">
+              {" "}
+              📸
+            </div>
+            <div className="absolute -bottom-4 -left-3 text-3xl">🌼</div>
+            <div className="absolute -top-2 right-2 text-3xl">✂️</div>
+            <div className="absolute bottom-2 right-2 text-3xl">🖇️</div>
 
-  <div className="relative">
+            <div className="border-2 border-gray-300 rounded-3xl p-4 bg-white">
+              {picOfDay.imageUrl ? (
+                <img
+                  src={resolveAssetUrl(picOfDay.imageUrl)}
+                  alt=""
+                  className="w-full h-72 object-cover rounded-xl"
+                />
+              ) : (
+                <div className="h-72 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-xl">
+                  Insert Image
+                </div>
+              )}
 
-    <div className="absolute -top-5 -left-4 rotate-[-20deg] text-3xl">  📸</div>
-    <div className="absolute -bottom-4 -left-3 text-3xl">🌼</div>
-    <div className="absolute -top-2 right-2 text-3xl">✂️</div>
-    <div className="absolute bottom-2 right-2 text-3xl">🖇️</div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePicOfDayChange}
+                className="mt-4"
+              />
+            </div>
+          </div>
 
-    <div className="rounded-3xl p-4" style={{ border: '1px solid var(--border)', background: 'rgba(255,255,255,0.04)' }}>
+          {/* Right Side */}
 
-      {picOfDay.imageUrl ? (
-        <img
-          src={resolveAssetUrl(picOfDay.imageUrl)}
-          alt=""
-          className="w-full h-72 object-cover rounded-xl"
-        />
-      ) : (
-        <div className="h-72 flex items-center justify-center border-2 border-dashed rounded-xl" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-          Insert Image
+          <div className="space-y-5">
+            <div className="border-2 border-gray-300 rounded-3xl p-4">
+              <h3 className="text-xl font-semibold mb-3">
+                How do I feel today?
+              </h3>
+
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setMood("Good")}
+                  className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
+                    mood === "Good" ? "bg-black text-white" : ""
+                  }`}>
+                  {" "}
+                  😊 Good{" "}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMood("Okay")}
+                  className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
+                    mood === "Okay" ? "bg-black text-white" : ""
+                  }`}>
+                  {" "}
+                  🙂 Okay{" "}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMood("Bad")}
+                  className={`px-4 py-2 rounded-full border-2 border-gray-300 ${
+                    mood === "Bad" ? "bg-black text-white" : ""
+                  }`}>
+                  {" "}
+                  😔 Bad{" "}
+                </button>
+              </div>
+            </div>
+
+            <div className="border-2 border-gray-300 rounded-3xl p-4">
+              <h3 className="font-semibold mb-2">🎀 Activity of the Day</h3>
+
+              <textarea
+                value={activity}
+                onChange={(e) => setActivity(e.target.value)}
+                rows="4"
+                className="w-full outline-none"
+              />
+            </div>
+          </div>
         </div>
-      )}
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handlePicOfDayChange}
-        className="mt-4"
-      />
-
-    </div>
-
-  </div>
-
-  {/* Right Side */}
-
-  <div className="space-y-5">
-    <div className="border-2 border-gray-300 rounded-3xl p-4">
-
-      <h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-h)' }}>
-        How do I feel today?
-      </h3>
-
-      <div className="flex gap-3 flex-wrap">
-
-        <button
-          type="button"
-          onClick={() => setMood("Good")}
-          className={`px-4 py-2 rounded-full border-2 ${
-            mood === "Good" ? "text-white" : ""
-          }`}
-          style={{ borderColor: 'var(--border)', background: mood === 'Good' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.04)', color: mood === 'Good' ? '#fff' : 'var(--text-muted)' }}
-        >          😊 Good        </button>
-
-        <button
-          type="button"
-          onClick={() => setMood("Okay")}
-          className={`px-4 py-2 rounded-full border-2 ${
-            mood === "Okay" ? "text-white" : ""
-          }`}
-          style={{ borderColor: 'var(--border)', background: mood === 'Okay' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.04)', color: mood === 'Okay' ? '#fff' : 'var(--text-muted)' }}
-        >          🙂 Okay        </button>
-
-        <button
-          type="button"
-          onClick={() => setMood("Bad")}
-          className={`px-4 py-2 rounded-full border-2 ${
-            mood === "Bad" ? "text-white" : ""
-          }`}
-          style={{ borderColor: 'var(--border)', background: mood === 'Bad' ? 'var(--accent-strong)' : 'rgba(255,255,255,0.04)', color: mood === 'Bad' ? '#fff' : 'var(--text-muted)' }}
-        >          😔 Bad        </button>
-
-      </div>
-
-    </div>
-
-    <div className="border-2 border-gray-300 rounded-3xl p-4">
-
-      <h3 className="font-semibold mb-2" style={{ color: 'var(--text-h)' }}>
-        🎀 Activity of the Day
-      </h3>
-
-      <textarea
-        value={activity}
-        onChange={(e) => setActivity(e.target.value)}
-        rows="4"
-        className="w-full outline-none rounded"
-        style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text)', border: '1px solid var(--border)', padding: '0.75rem' }}
-      />
-
-    </div>
-
-  </div>
-
-</div>
 
         {/* Stickers Section */}
         <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-muted)' }}>Add Stickers</label>
+          <label className="block text-sm font-medium mb-2">Add Stickers</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleStickerUpload}
             disabled={stickerUploading}
             className="px-4 py-2 border rounded"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text)', borderColor: 'var(--border)' }}
           />
           {stickerUploading && (
-            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>Uploading...</p>
+            <p className="text-sm text-gray-500 mt-2">Uploading...</p>
           )}
         </div>
 
@@ -630,8 +716,7 @@ export default function NewEntry() {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              className="relative w-full rounded p-4"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', minHeight: '300px' }}
+              className="relative w-full bg-gray-50 border-2 border-gray-300 rounded p-4"
               style={{ minHeight: "300px" }}>
               {stickers.map((sticker) => (
                 <div
@@ -655,9 +740,17 @@ export default function NewEntry() {
                   {/* resize handle */}
                   {selectedStickerId === sticker.stickerId && (
                     <div
-                      onMouseDown={(e)=>handleResizeMouseDown(e, sticker.stickerId)}
+                      onMouseDown={(e) =>
+                        handleResizeMouseDown(e, sticker.stickerId)
+                      }
                       className="absolute bg-white border border-slate-300 rounded-full"
-                      style={{width:16,height:16,right:-8,bottom:-8,cursor:'se-resize'}}
+                      style={{
+                        width: 16,
+                        height: 16,
+                        right: -8,
+                        bottom: -8,
+                        cursor: "se-resize",
+                      }}
                     />
                   )}
                   {selectedStickerId === sticker.stickerId && (
@@ -675,36 +768,62 @@ export default function NewEntry() {
         )}
 
         <div className="flex justify-center gap-8 text-2xl mt-6 opacity-70">
-
-  <span>☁</span>  <span>✦</span>  <span>♡</span>  <span>☾</span>  <span>✿</span>  <span>♡</span>  <span>✦</span>
-
-</div>
+          <span>☁</span> <span>✦</span> <span>♡</span> <span>☾</span>{" "}
+          <span>✿</span> <span>♡</span> <span>✦</span>
+        </div>
 
         <button
           type="submit"
           disabled={saving}
-          className="w-full px-6 py-3 rounded font-semibold"
-          style={{ background: 'var(--accent-strong)', color: '#f9fbff' }}>
-          {saving ? "Saving..." : "Save Entry"}
+          className="w-full px-6 py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-700 disabled:bg-gray-400">
+          {saving ? "Saving..." : "Update Entry"}
         </button>
         {showStickerPanel && (
-          <div className="fixed right-6 top-20 w-80 max-h-[70vh] overflow-auto rounded-lg p-4 shadow-lg z-50" style={{ background: 'rgba(17, 28, 50, 0.98)', border: '1px solid var(--border)' }}>
+          <div className="fixed right-6 top-20 w-80 max-h-[70vh] overflow-auto bg-white border rounded-lg p-4 shadow-lg z-50">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">Your Stickers</h3>
-              <button type="button" onClick={()=>setShowStickerPanel(false)} className="text-sm" style={{ color: 'var(--text-muted)' }}>Close</button>
+              <button
+                type="button"
+                onClick={() => setShowStickerPanel(false)}
+                className="text-sm text-slate-500">
+                Close
+              </button>
             </div>
-            {pastStickers.length===0 ? (
-              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>No saved stickers yet.</div>
+            {pastStickers.length === 0 ? (
+              <div className="text-sm text-slate-500">
+                No saved stickers yet.
+              </div>
             ) : (
               <div className="grid gap-3">
-                {pastStickers.map((stk)=> (
+                {pastStickers.map((stk) => (
                   <div key={stk._id} className="flex items-center gap-3">
-                    <img src={resolveAssetUrl(stk.imageUrl)} alt="stk" className="w-16 h-16 object-cover rounded" />
+                    <img
+                      src={resolveAssetUrl(stk.imageUrl)}
+                      alt="stk"
+                      className="w-16 h-16 object-cover rounded"
+                    />
                     <div className="flex-1">
-                      <div className="text-sm font-medium">{stk.label||'Sticker'}</div>
+                      <div className="text-sm font-medium">
+                        {stk.label || "Sticker"}
+                      </div>
                       <div className="mt-2 flex gap-2">
-                        <button type="button" onClick={()=>handleSidebarInsert(stk)} className="px-2 py-1 bg-blue-600 text-white rounded text-xs">Insert</button>
-                        <button type="button" onClick={()=>{navigator.clipboard?.writeText(resolveAssetUrl(stk.imageUrl)); setSuccessMsg('Copied URL');}} className="px-2 py-1 bg-slate-100 rounded text-xs">Copy URL</button>
+                        <button
+                          type="button"
+                          onClick={() => handleSidebarInsert(stk)}
+                          className="px-2 py-1 bg-blue-600 text-white rounded text-xs">
+                          Insert
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard?.writeText(
+                              resolveAssetUrl(stk.imageUrl),
+                            );
+                            setSuccessMsg("Copied URL");
+                          }}
+                          className="px-2 py-1 bg-slate-100 rounded text-xs">
+                          Copy URL
+                        </button>
                       </div>
                     </div>
                   </div>
