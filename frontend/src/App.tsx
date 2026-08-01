@@ -15,6 +15,8 @@ import Auth from "./components/Auth";
 import ScanDiaryPage from "./components/ScanDiaryPage";
 import SettingsPage from "./components/SettingsPage";
 import { GlobalAudio } from "./components/GlobalAudio";
+import api from "./api/api";
+import AdminPanel from "./components/AdminPanel";
 
 // Background Assets
 import BGLight from "./assets/BGLight.png";
@@ -118,12 +120,21 @@ function Home() {
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [accountStatus, setAccountStatus] = useState<{ restricted: boolean; warned: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      // fetch account status after sign-in
+      if (currentUser) {
+        // Ensure the backend has a User document for this firebase user
+        api.post('/account/upsert').catch((e) => console.warn('Could not upsert user', e));
+        api.get('/account/status').then(r => setAccountStatus(r.data)).catch(() => setAccountStatus(null));
+      } else {
+        setAccountStatus(null);
+      }
     });
 
     return () => unsubscribe();
@@ -154,6 +165,17 @@ function App() {
       <BrowserRouter>
         <GlobalAudio />
         <Header />
+        {/* Global banners for warn/restricted */}
+        {accountStatus?.warned && (
+          <div className="w-full text-center py-3 bg-red-100 text-red-800 font-semibold">
+            Your account is violating our rules. Please contact redreaster@gmail.com
+          </div>
+        )}
+        {accountStatus?.restricted && (
+          <div className="w-full text-center py-6 bg-red-600 text-white font-extrabold text-xl">
+            Your account has been restricted. Please email redreaster@gmail.com
+          </div>
+        )}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/new" element={<NewEntry />} />
@@ -163,6 +185,7 @@ function App() {
           <Route path="/edit/:id" element={<EditEntry />} />
           <Route path="/scan/" element={<ScanDiaryPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin" element={user?.email === 'redreaster@gmail.com' ? <AdminPanel /> : <div />} />
         </Routes>
         <Footer />
       </BrowserRouter>

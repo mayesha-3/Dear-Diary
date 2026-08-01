@@ -26,6 +26,16 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // Administrative flags
+    restricted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    warned: {
+      type: Boolean,
+      default: false,
+    },
     // User preferences (theme, font, etc.) can grow here
     preferences: {
       theme: { type: String, default: 'light' },

@@ -20,6 +20,8 @@ import entryRoutes      from './routes/entries.js';
 import stickerRoutes    from './routes/stickers.js';
 import imageOfDayRoutes from './routes/imageOfDay.js';
 import pdfRoutes        from './routes/route.js';
+import adminRoutes      from './routes/admin.js';
+import accountRoutes    from './routes/account.js';
 
 // ── App setup ────────────────────────────────────────────
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,6 +54,8 @@ app.use("/api/entries",      entryRoutes);
 app.use("/api/stickers",     stickerRoutes);
 app.use("/api/image-of-day", imageOfDayRoutes);
 app.use("/api",              pdfRoutes);
+app.use("/api/admin",        adminRoutes);
+app.use("/api/account",      accountRoutes);
 
 // ── Global error handler ─────────────────────────────────
 app.use((err, _req, res, _next) => {

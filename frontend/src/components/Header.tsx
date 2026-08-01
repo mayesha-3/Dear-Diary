@@ -184,6 +184,14 @@ function Header() {
             style={{ color: "var(--text-muted)" }}>
             Sticker Factory
           </Link>
+          {user?.email === 'redreaster@gmail.com' && (
+            <Link
+              to="/admin"
+              className="px-3 py-2 rounded transition duration-150 hover:opacity-80"
+              style={{ color: "var(--text-muted)" }}>
+              Admin
+            </Link>
+          )}
           <Link
             to="/scan"
             className="px-3 py-2 rounded transition duration-150 hover:opacity-80"

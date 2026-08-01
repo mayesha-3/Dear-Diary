@@ -1,6 +1,7 @@
 // backend/routes/entries.js
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
+import { accountStatus } from '../middleware/accountStatus.js';
 import {
   getEntries,
   getPicOfTheDay,
@@ -14,6 +15,8 @@ const router = express.Router();
 
 // All entry routes require a valid Firebase ID token
 router.use(requireAuth);
+// Enforce restrictions and warnings for entry access
+router.use(accountStatus);
 
 // IMPORTANT: specific routes must come before /:id
 router.get('/pic-of-the-day', getPicOfTheDay);
